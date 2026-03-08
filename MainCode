@@ -1,0 +1,44 @@
+#include <iostream>
+
+/*
+	КАЛЬКУЛЯТОР версии 1.0, работа через switch()
+*/
+
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	srand(time(NULL)); // делает так чтобы рандомные числа падали всегда!
+
+
+	float num1, num2, answer;
+	cout << "Введите первое число: ";
+	cin >> num1;
+
+	cout << "Введите второе число: ";
+	cin >> num2;
+
+	// +, -, *, /
+	char math;
+	cout << "Виды действий: сумма(+), разность(-), произведение(*), деление(/). \n";
+	cout << "Введите математичесский символ: ";
+	cin >> math;
+
+
+	switch (math)
+	{
+	case '+': answer = num1 + num2; break;
+	case '-': answer = num1 - num2; break;
+	case '*': answer = num1 * num2; break;
+	case '/': answer = num1 / num2; break;
+	default: 
+		answer = 0;
+		cout << "Error\n";
+		break;
+	}
+
+	cout << "Ответ: " << answer << endl;
+
+	return 0;
+}

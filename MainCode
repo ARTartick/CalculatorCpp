@@ -1,5 +1,10 @@
 /*
-    Calculator v1.3.6
+    Calculator v1.4.1 - optimization & stability
+    Список изменений:
+    1) замена всех переменных типа float на 1 большой массив данных
+    2) комманда дебага: 'm' - показывает значения элементов массива
+    Список правок:
+    1) улучшена команда дебага: 'm'
 */
 
 #include <iostream>
@@ -7,10 +12,12 @@ using namespace std;
 
 // функции
 void SayHello();
-void Summa();
-void Minus();
-void Multiply();
-void Divide();
+void Summa(float* mas);
+void Minus(float* mas);
+void Multiply(float* mas);
+void Divide(float* mas);
+void MassivVal(float* mas);
+void sep();
 bool Escape();
 
 int main()
@@ -20,6 +27,7 @@ int main()
     // переменные и массивы
     char command;
     bool is_works = true;
+    float massiv[5] = { 0, 0, 0, 0, 0 };
 
     // приветствие
     cout << "Привет, пользователь!\n";
@@ -35,16 +43,15 @@ int main()
         cin >> command;
 
         // проверка комманды
-        if (command == '+')
-            Summa();
-        else if (command == '-')
-            Minus();
-        else if (command == '*')
-            Multiply();
-        else if (command == '/')
-            Divide();
-        else if (command == 'e')
-            is_works = Escape();
+        switch (command)
+        {
+        case '+': Summa(massiv); break;
+        case '-': Minus(massiv); break;
+        case '*': Multiply(massiv); break;
+        case '/': Divide(massiv); break;
+        case 'e': is_works = Escape(); break;
+        case 'm': MassivVal(massiv); break;
+        }
     }
     return 0;
 }
@@ -58,88 +65,92 @@ void SayHello()
     cout << "Деление - '/'\n";
     cout << "Выход - 'e'\n";
 }
-void Summa()
+void Summa(float* mas)
 {
-    float a;
-    float b;
-    
-    cout << " \n";
+    sep();
     cout << "Сложение: a + b\n"; // формула
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> a;
+    cin >> *mas; // первый элемент массива - a
     cout << "Введите b: ";
-    cin >> b;
+    cin >> *(mas + 1); // второй элемент массива - b
 
-    float answer = a + b;
-    cout << a << " + " << b << " = " << answer << endl;
-    cout << " \n";
+    *(mas + 3) = *mas + *(mas + 1); // четвертый элемент массива - answer
+    cout << *mas << " + " << *(mas + 1) << " = " << *(mas + 3) << endl;
+    sep();
 }
-void Minus()
+void Minus(float* mas)
 {
-    float a;
-    float b;
-
-    cout << " \n";
+    sep();
     cout << "Вычитание: a - b\n"; // формула
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> a;
+    cin >> *mas;
     cout << "Введите b: ";
-    cin >> b;
+    cin >> *(mas+1);
 
-    float answer = a - b;
-    cout << a << " - " << b << " = " << answer << endl;
-    cout << " \n";
+    *(mas+3) = *mas - *(mas+1);
+    cout << *mas << " - " << *(mas+1) << " = " << *(mas+3) << endl;
+    sep();
 }
-void Multiply()
+void Multiply(float* mas)
 {
-    float a;
-    float b;
-
-    cout << " \n";
+    sep();
     cout << "Умножение: a * b\n"; // формула
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> a;
+    cin >> *mas;
     cout << "Введите b: ";
-    cin >> b;
+    cin >> *(mas+1);
 
-    float answer = a * b;
-    cout << a << " * " << b << " = " << answer << endl;
-    cout << " \n";
+    *(mas+3) = *mas * *(mas+1);
+    cout << *mas << " * " << *(mas+1) << " = " << *(mas+3) << endl;
+    sep();
 }
-void Divide()
+void Divide(float* mas)
 {
-    float a;
-    float b;
-
-    cout << " \n";
+    sep();
     cout << "Деление: a / b\n"; // формула
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> a;
+    cin >> *mas;
     cout << "Введите b: ";
-    cin >> b;
-    if (b != 0)
+    cin >> *(mas+1);
+    if (*(mas+1) != 0)
     {
         // вывод ответа
-        float answer = a / b;
-        cout << a << " / " << b << " = " << answer << endl;
+        *(mas+3) = *mas / *(mas+1);
+        cout << *mas << " / " << *(mas+1) << " = " << *(mas+3) << endl;
     }
     else
         cout << "Ошибка: делить на ноль нельзя\n";
-    cout << " \n";
+    sep();
 }
 bool Escape()
 {
-    cout << " \n";
+    sep();
     cout << "Выход из программы...\n";
     cout << "До встречи, пользователь!";
-    cout << " \n";
+    sep();
     return false;
+}
+void sep()
+{
+    cout << "\n";
+    cout << "-------------------\n";
+    cout << "\n";
+}
+void MassivVal(float* mas)
+{
+    sep();
+    cout << "a - " << *mas << endl;
+    cout << "b - " << *(mas + 1) << endl;
+    cout << "c - " << *(mas + 2) << endl;
+    cout << "Last answer - " << *(mas + 3) << endl;
+    cout << "Discr - " << *(mas + 4) << endl;
+    sep();
 }

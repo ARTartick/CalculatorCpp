@@ -1,44 +1,120 @@
-#include <iostream>
-
 /*
-	КАЛЬКУЛЯТОР версии 1.0, работа через switch()
+    Calculator v1.1.3
+    Исправления: 
+    1) добавлены break; в конце каждого case
+    2) команда 'e' присваивает is_works значение false
+    3) теперь при делении на 0 выдаёт ошибку в консоль
 */
 
+#include <iostream>
 using namespace std;
 
 int main()
 {
-	setlocale(LC_ALL, "RU");
-	srand(time(NULL)); // делает так чтобы рандомные числа падали всегда!
+    setlocale(LC_ALL, "RU");
 
+    // переменные и массивы
+    float numbers[3];
+    char command;
+    bool is_works = true;
+    float answer = 0;
 
-	float num1, num2, answer;
-	cout << "Введите первое число: ";
-	cin >> num1;
+    // приветствие
+    cout << "Привет, пользователь!\n";
+    cout << "Это Калькулятор версии 1.1\n";
 
-	cout << "Введите второе число: ";
-	cin >> num2;
+    // собственно сам калькулятор
+    while (is_works == true)
+    {
+        // комманды
+        cout << "Доступные комманды:\n";
+        cout << "Суммма - '+'\n";
+        cout << "Разность - '-'\n";
+        cout << "Произведение - '*'\n";
+        cout << "Деление - '/'\n";
+        cout << "Выход - 'e'\n";
 
-	// +, -, *, /
-	char math;
-	cout << "Виды действий: сумма(+), разность(-), произведение(*), деление(/). \n";
-	cout << "Введите математичесский символ: ";
-	cin >> math;
+        // ввод
+        cin >> command;
 
+        // проверка комманды
+        switch (command)
+        {
+            case '+': // сумма
+                cout << " \n";
+                cout << "Сумма: a + b\n"; // формула
 
-	switch (math)
-	{
-	case '+': answer = num1 + num2; break;
-	case '-': answer = num1 - num2; break;
-	case '*': answer = num1 * num2; break;
-	case '/': answer = num1 / num2; break;
-	default: 
-		answer = 0;
-		cout << "Error\n";
-		break;
-	}
+                // ввод чисел
+                cout << "Введите а: ";
+                cin >> numbers[0];
+                cout << "Введите b: ";
+                cin >> numbers[1];
 
-	cout << "Ответ: " << answer << endl;
+                // вывод ответа
+                answer = numbers[0] + numbers[1];
+                cout << numbers[0] << " + " << numbers[1] << " = " << answer << endl;
+                cout << " \n";
+                break;
 
-	return 0;
+            case '-': // разность
+                cout << " \n";
+                cout << "Разность: a - b\n"; // формула
+
+                // ввод чисел
+                cout << "Введите а: ";
+                cin >> numbers[0];
+                cout << "Введите b: ";
+                cin >> numbers[1];
+
+                // вывод ответа
+                answer = numbers[0] - numbers[1];
+                cout << numbers[0] << " - " << numbers[1] << " = " << answer << endl;
+                cout << " \n";
+                break;
+
+            case '*': // произведение
+                cout << " \n";
+                cout << "Произведение: a * b\n"; // формула
+
+                // ввод чисел
+                cout << "Введите а: ";
+                cin >> numbers[0];
+                cout << "Введите b: ";
+                cin >> numbers[1];
+
+                // вывод ответа
+                answer = numbers[0] * numbers[1];
+                cout << numbers[0] << " * " << numbers[1] << " = " << answer << endl;
+                cout << " \n";
+                break;
+
+            case '/': // деление
+                cout << " \n";
+                cout << "Деление: a / b\n"; // формула
+
+                // ввод чисел
+                cout << "Введите а: ";
+                cin >> numbers[0];
+                cout << "Введите b: ";
+                cin >> numbers[1];
+                if (numbers[1] != 0)
+                {
+                    // вывод ответа
+                    answer = numbers[0] / numbers[1];
+                    cout << numbers[0] << " / " << numbers[1] << " = " << answer << endl;
+                }
+                else
+                    cout << "Ошибка: делить на ноль нельзя\n";
+                cout << " \n";
+                break;
+
+            case 'e': // выход - exit/escape
+                cout << " \n";
+                cout << "Выход из программы...\n";
+                cout << "До встречи, пользователь!";
+                cout << " \n";
+                is_works = false;
+                break;
+        }
+    }
 }

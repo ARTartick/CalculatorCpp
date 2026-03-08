@@ -1,120 +1,145 @@
 /*
-    Calculator v1.1.3
-    Исправления: 
-    1) добавлены break; в конце каждого case
-    2) команда 'e' присваивает is_works значение false
-    3) теперь при делении на 0 выдаёт ошибку в консоль
+    Calculator v1.3.6
 */
 
 #include <iostream>
 using namespace std;
+
+// функции
+void SayHello();
+void Summa();
+void Minus();
+void Multiply();
+void Divide();
+bool Escape();
 
 int main()
 {
     setlocale(LC_ALL, "RU");
 
     // переменные и массивы
-    float numbers[3];
     char command;
     bool is_works = true;
-    float answer = 0;
 
     // приветствие
     cout << "Привет, пользователь!\n";
-    cout << "Это Калькулятор версии 1.1\n";
+    cout << "Это Калькулятор версии 1.3\n";
 
     // собственно сам калькулятор
     while (is_works == true)
     {
         // комманды
-        cout << "Доступные комманды:\n";
-        cout << "Суммма - '+'\n";
-        cout << "Разность - '-'\n";
-        cout << "Произведение - '*'\n";
-        cout << "Деление - '/'\n";
-        cout << "Выход - 'e'\n";
+        SayHello();
 
         // ввод
         cin >> command;
 
         // проверка комманды
-        switch (command)
-        {
-            case '+': // сумма
-                cout << " \n";
-                cout << "Сумма: a + b\n"; // формула
-
-                // ввод чисел
-                cout << "Введите а: ";
-                cin >> numbers[0];
-                cout << "Введите b: ";
-                cin >> numbers[1];
-
-                // вывод ответа
-                answer = numbers[0] + numbers[1];
-                cout << numbers[0] << " + " << numbers[1] << " = " << answer << endl;
-                cout << " \n";
-                break;
-
-            case '-': // разность
-                cout << " \n";
-                cout << "Разность: a - b\n"; // формула
-
-                // ввод чисел
-                cout << "Введите а: ";
-                cin >> numbers[0];
-                cout << "Введите b: ";
-                cin >> numbers[1];
-
-                // вывод ответа
-                answer = numbers[0] - numbers[1];
-                cout << numbers[0] << " - " << numbers[1] << " = " << answer << endl;
-                cout << " \n";
-                break;
-
-            case '*': // произведение
-                cout << " \n";
-                cout << "Произведение: a * b\n"; // формула
-
-                // ввод чисел
-                cout << "Введите а: ";
-                cin >> numbers[0];
-                cout << "Введите b: ";
-                cin >> numbers[1];
-
-                // вывод ответа
-                answer = numbers[0] * numbers[1];
-                cout << numbers[0] << " * " << numbers[1] << " = " << answer << endl;
-                cout << " \n";
-                break;
-
-            case '/': // деление
-                cout << " \n";
-                cout << "Деление: a / b\n"; // формула
-
-                // ввод чисел
-                cout << "Введите а: ";
-                cin >> numbers[0];
-                cout << "Введите b: ";
-                cin >> numbers[1];
-                if (numbers[1] != 0)
-                {
-                    // вывод ответа
-                    answer = numbers[0] / numbers[1];
-                    cout << numbers[0] << " / " << numbers[1] << " = " << answer << endl;
-                }
-                else
-                    cout << "Ошибка: делить на ноль нельзя\n";
-                cout << " \n";
-                break;
-
-            case 'e': // выход - exit/escape
-                cout << " \n";
-                cout << "Выход из программы...\n";
-                cout << "До встречи, пользователь!";
-                cout << " \n";
-                is_works = false;
-                break;
-        }
+        if (command == '+')
+            Summa();
+        else if (command == '-')
+            Minus();
+        else if (command == '*')
+            Multiply();
+        else if (command == '/')
+            Divide();
+        else if (command == 'e')
+            is_works = Escape();
     }
+    return 0;
+}
+
+void SayHello()
+{
+    cout << "Доступные комманды:\n";
+    cout << "Сложение - '+'\n";
+    cout << "Вычитание - '-'\n";
+    cout << "Умножение - '*'\n";
+    cout << "Деление - '/'\n";
+    cout << "Выход - 'e'\n";
+}
+void Summa()
+{
+    float a;
+    float b;
+    
+    cout << " \n";
+    cout << "Сложение: a + b\n"; // формула
+
+    // ввод чисел
+    cout << "Введите а: ";
+    cin >> a;
+    cout << "Введите b: ";
+    cin >> b;
+
+    float answer = a + b;
+    cout << a << " + " << b << " = " << answer << endl;
+    cout << " \n";
+}
+void Minus()
+{
+    float a;
+    float b;
+
+    cout << " \n";
+    cout << "Вычитание: a - b\n"; // формула
+
+    // ввод чисел
+    cout << "Введите а: ";
+    cin >> a;
+    cout << "Введите b: ";
+    cin >> b;
+
+    float answer = a - b;
+    cout << a << " - " << b << " = " << answer << endl;
+    cout << " \n";
+}
+void Multiply()
+{
+    float a;
+    float b;
+
+    cout << " \n";
+    cout << "Умножение: a * b\n"; // формула
+
+    // ввод чисел
+    cout << "Введите а: ";
+    cin >> a;
+    cout << "Введите b: ";
+    cin >> b;
+
+    float answer = a * b;
+    cout << a << " * " << b << " = " << answer << endl;
+    cout << " \n";
+}
+void Divide()
+{
+    float a;
+    float b;
+
+    cout << " \n";
+    cout << "Деление: a / b\n"; // формула
+
+    // ввод чисел
+    cout << "Введите а: ";
+    cin >> a;
+    cout << "Введите b: ";
+    cin >> b;
+    if (b != 0)
+    {
+        // вывод ответа
+        float answer = a / b;
+        cout << a << " / " << b << " = " << answer << endl;
+    }
+    else
+        cout << "Ошибка: делить на ноль нельзя\n";
+    cout << " \n";
+}
+bool Escape()
+{
+    cout << " \n";
+    cout << "Выход из программы...\n";
+    cout << "До встречи, пользователь!";
+    cout << " \n";
+    return false;
 }

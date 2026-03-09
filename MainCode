@@ -1,11 +1,12 @@
 /*
-    Calculator v1.4.2
+    Calculator v1.4.3
     Список изменений:
     1) замена всех переменных типа float на 1 большой массив данных
     2) комманда дебага: 'm' - показывает значения элементов массива
     Список правок:
     1) улучшена команда дебага: 'm'
-    2) исправил ошибки в выводе
+    2) исправление грамматических ошибок
+    3) замена *(mas+i) на mas[i]
 */
 
 #include <iostream>
@@ -32,7 +33,7 @@ int main()
 
     // приветствие
     cout << "Привет, пользователь!\n";
-    cout << "Это Калькулятор версии 1.4.2\n";
+    cout << "Это Калькулятор версии 1.3\n";
 
     // собственно сам калькулятор
     while (is_works == true)
@@ -73,27 +74,27 @@ void Summa(float* mas)
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> *mas; // первый элемент массива - a
+    cin >> mas[0]; // первый элемент массива - a
     cout << "Введите b: ";
-    cin >> *(mas + 1); // второй элемент массива - b
+    cin >> mas[1]; // второй элемент массива - b
 
-    *(mas + 3) = *mas + *(mas + 1); // четвертый элемент массива - answer
-    cout << *mas << " + " << *(mas + 1) << " = " << *(mas + 3) << endl;
+    mas[3] = mas[0] + mas[1]; // четвертый элемент массива - answer
+    cout << mas[0] << " + " << mas[1] << " = " << mas[3] << endl;
     sep();
 }
-void Minus(float* mas)
+void Minus(float* mas) 
 {
     sep();
     cout << "Вычитание: a - b\n"; // формула
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> *mas;
+    cin >> mas[0];
     cout << "Введите b: ";
-    cin >> *(mas+1);
+    cin >> mas[1];
 
-    *(mas+3) = *mas - *(mas+1);
-    cout << *mas << " - " << *(mas+1) << " = " << *(mas+3) << endl;
+    mas[3] = mas[0] - mas[1];
+    cout << mas[0] << " - " << mas[1] << " = " << mas[3] << endl;
     sep();
 }
 void Multiply(float* mas)
@@ -103,12 +104,12 @@ void Multiply(float* mas)
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> *mas;
+    cin >> mas[0];
     cout << "Введите b: ";
-    cin >> *(mas+1);
+    cin >> mas[1];
 
-    *(mas+3) = *mas * *(mas+1);
-    cout << *mas << " * " << *(mas+1) << " = " << *(mas+3) << endl;
+    mas[3] = mas[0] * mas[1];
+    cout << mas[0] << " * " << mas[1] << " = " << mas[3] << endl;
     sep();
 }
 void Divide(float* mas)
@@ -118,14 +119,14 @@ void Divide(float* mas)
 
     // ввод чисел
     cout << "Введите а: ";
-    cin >> *mas;
+    cin >> mas[0];
     cout << "Введите b: ";
-    cin >> *(mas+1);
-    if (*(mas+1) != 0)
+    cin >> mas[1];
+    if (mas[1] != 0)
     {
         // вывод ответа
-        *(mas+3) = *mas / *(mas+1);
-        cout << *mas << " / " << *(mas+1) << " = " << *(mas+3) << endl;
+        mas[3] = mas[0] / mas[1];
+        cout << mas[0] << " / " << mas[1] << " = " << mas[3] << endl;
     }
     else
         cout << "Ошибка: делить на ноль нельзя\n";
@@ -148,10 +149,10 @@ void sep()
 void MassivVal(float* mas)
 {
     sep();
-    cout << "a - " << *mas << endl;
-    cout << "b - " << *(mas + 1) << endl;
-    cout << "c - " << *(mas + 2) << endl;
-    cout << "Last answer - " << *(mas + 3) << endl;
-    cout << "Discr - " << *(mas + 4) << endl;
+    cout << "a - " << mas[0] << endl;
+    cout << "b - " << mas[1] << endl;
+    cout << "c - " << mas[2] << endl;
+    cout << "Last answer - " << mas[3] << endl;
+    cout << "Discr - " << mas[4] << endl;
     sep();
 }

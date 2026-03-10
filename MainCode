@@ -1,5 +1,5 @@
 /*
-	Calculator v1.5.2.1 - Debug Mode
+	Calculator v1.5.3 - Debug Mode
 	Major:
 	1) переписан весь код с нуля
 	2) выдаёт ошибку, если вписать не число
@@ -8,6 +8,7 @@
 	Minor:
 	1) исправлены критические баги, переработана функция GetFloat()
 	2) исправлены баги, добавлена команда для очистки экрана
+	3) сделана команда [1] в debug-mode
 */
 
 #include <iostream>
@@ -21,7 +22,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.2";
+const string VERSION = "1.5.3";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -43,6 +44,7 @@ void Divide(float* mas);
 bool EnterDebugMode();
 bool QuitDebugMode();
 void DebugMode(float* mas);
+void ShowArray(float* mas);
 
 // Утилиты
 void sep();
@@ -279,7 +281,7 @@ void DebugMode(float* mas)
 	{
 		sep();
 		cout << "DEBUG MODE MENU";
-		cout << "\n[1] Просмотр массива (in progress)\n";
+		cout << "\n[1] Просмотр массива\n";
 		cout << "[2] Статистика вычислений (in progress)\n";
 		cout << "[3] Общая статистика (in progress)\n";
 		cout << "[4] История вычислений (in progress)\n";
@@ -289,7 +291,8 @@ void DebugMode(float* mas)
 
 		switch (debugCMD)
 		{
-		case '0': inDebug = QuitDebugMode();
+		case '0': inDebug = QuitDebugMode(); break;
+		case '1': ShowArray(mas); break;
 		}
 	}
 }
@@ -299,4 +302,16 @@ bool QuitDebugMode()
 	cout << "ВЫ ВЫШЛИ ИЗ DEBUG MODE";
 	cout << "\n=======================\n";
 	return false;
+}
+void ShowArray(float* mas)
+{
+	cout << "\n=ShowArray\n";
+
+	cout << "a: " << mas[0] << endl;
+	cout << "b: " << mas[1] << endl;
+	cout << "c: " << mas[2] << endl;
+	cout << "Last Answer: " << mas[3] << endl;
+	cout << "Last second Answer: " << mas[4] << endl;
+	cout << "Discr: " << mas[5] << endl;
+
 }

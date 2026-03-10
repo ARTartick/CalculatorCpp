@@ -1,5 +1,5 @@
 /*
-	Calculator v1.5.1 - Debug Mode
+	Calculator v1.5.2 - Debug Mode
 	Major:
 	1) переписан весь код с нуля
 	2) выдаёт ошибку, если вписать не число
@@ -7,6 +7,7 @@
 	4) DEBUG-MODE (in progress)
 	Minor:
 	1) исправлены критические баги, переработана функция GetFloat()
+	2) исправлены баги, добавлена команда для очистки экрана
 */
 
 #include <iostream>
@@ -14,12 +15,13 @@
 #include <ctime>
 #include <iomanip>
 #include <limits>
+#include <cstdlib>
 using namespace std;
 
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.1";
+const string VERSION = "1.5.2";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -44,8 +46,9 @@ void DebugMode(float* mas);
 
 // Утилиты
 void sep();
-bool GetFloat(float& value);
+float GetFloat();
 bool Escape();
+void ClearCMD();
 
 //==========================================================
 // MAIN
@@ -58,7 +61,7 @@ int main()
 	// переменные
 	char command;
 	bool is_works = true;
-	float massive[5] = { 0, 0, 0, 0, 0 };
+	float massive[6] = { 0, 0, 0, 0, 0, 0 };
 
 	// привет^^
 	cout << "++======================================++\n";
@@ -84,6 +87,7 @@ int main()
 			}
 			break;
 		case 'e': is_works = Escape(); break;
+		case 'c': ClearCMD(); break;
 		default:
 			cout << "Неизвестная команда\n";
 		}
@@ -103,6 +107,7 @@ void SayHello()
 	cout << "'-' - Вычитание\n";
 	cout << "'*' - Умножение\n";
 	cout << "'/' - Деление\n";
+	cout << "'c' - Очистить экран\n"
 	cout << "'e' - Выход\n";
 	cout << "Введите команду: ";
 }
@@ -219,9 +224,18 @@ bool Escape()
 {
 	sep();
 	cout << "Выход из программы...\n";
-	cout << "До встречи, пользователь!";
+	cout << "До встречи, пользователь!\n";
 	sep();
 	return false;
+}
+
+void ClearCMD()
+{
+#ifdef _WIN32
+	system("cls");
+#else
+	system("clear");
+#endif
 }
 // ============================================================================
 // DEBUG MODE

@@ -1,161 +1,278 @@
 /*
-    Calculator v1.4.6
-    Список изменений:
-    1) замена всех переменных типа float на 1 большой массив данных
-    2) комманда дебага: 'm' - показывает значения элементов массива
-    Список правок:
-    1) улучшена команда дебага: 'm'
-    2) исправление грамматических ошибок
-    3) замена *(mas+i) на mas[i]
-    4) исправление 1-ой сука ошибки, снова
-    5) константа для версии
-    6) улучшена функция sep()
+	Calculator v1.5.0 - Debug Mode
+	Major:
+    1) переписан весь код с нуля
+    2) выдаёт ошибку, если вписать не число
+    3) теперь чуть покрасивее
+    4) DEBUG-MODE (in progress)
 */
 
 #include <iostream>
+#include <string>
+#include <ctime>
+#include <iomanip>
 using namespace std;
 
-// функции
+// ==================================
+// КОНСТАНТЫ
+// ==================================
+const string VERSION = "1.5.0";
+const string PASSWORD = "admin123";
+
+//===================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+//===================================
+int stats[5];
+time_t session_start;
+
+//===================================
+// ПРОТОТИПЫ ФУНКЦИЙ
+//===================================
+// основные
 void SayHello();
 void Summa(float* mas);
 void Minus(float* mas);
 void Multiply(float* mas);
 void Divide(float* mas);
-void MassivVal(float* mas);
+// Debug-режим
+bool EnterDebugMode();
+bool QuitDebugMode();
+void DebugMode(float* mas);
+
+// Утилиты
 void sep();
+bool GetFloat(float& value);
 bool Escape();
 
-const string VERSION = "1.4.6";
-
+//==========================================================
+// MAIN
+//==========================================================
 int main()
 {
-    setlocale(LC_ALL, "RU");
+	setlocale(LC_ALL, "RU");
+	session_start = time(nullptr); // запуск тайммера сессии
 
-    // переменные и массивы
-    char command;
-    bool is_works = true;
-    float massiv[5] = { 0, 0, 0, 0, 0 };
+	// переменные
+	char command;
+	bool is_works = true;
+	float massive[5] = { 0, 0, 0, 0, 0 };
 
-    // приветствие
-    cout << "Привет, пользователь!\n";
-    cout << "Это Калькулятор версии " << VERSION << endl;
+	// привет^^
+	cout << "++======================================++\n";
+	cout << "||   CalculatorCpp версии " << setw(10) << VERSION << "    ||\n";
+	cout << "++======================================++\n";
 
-    // собственно сам калькулятор
-    while (is_works == true)
-    {
-        // комманды
-        SayHello();
+	// основной цикл
+	while (is_works)
+	{
+		SayHello();
+		cin >> command;
 
-        // ввод
-        cin >> command;
+		switch (command)
+		{
+		case '+': Summa(massive); break;
+		case '-': Minus(massive); break;
+		case '*': Multiply(massive); break;
+		case '/': Divide(massive); break;
+		case 'd':
+			if (EnterDebugMode())
+			{
+				DebugMode(massive);
+			}
+			break;
+		case 'e': is_works = Escape(); break;
+		default:
+			cout << "Неизвестная команда\n";
+		}
+	}
 
-        // проверка комманды
-        switch (command)
-        {
-        case '+': Summa(massiv); break;
-        case '-': Minus(massiv); break;
-        case '*': Multiply(massiv); break;
-        case '/': Divide(massiv); break;
-        case 'e': is_works = Escape(); break;
-        case 'm': MassivVal(massiv); break;
-        }
-    }
-    return 0;
+	cout << "\nСпасибо за использование CalculatorCpp\n";
+	return 0;
 }
 
+// ============================================================================
+// ОСНОВНЫЕ ФУНКЦИИ КАЛЬКУЛЯТОРА
+// ============================================================================
 void SayHello()
 {
-    cout << "Доступные комманды:\n";
-    cout << "Сложение - '+'\n";
-    cout << "Вычитание - '-'\n";
-    cout << "Умножение - '*'\n";
-    cout << "Деление - '/'\n";
-    cout << "Выход - 'e'\n";
+	cout << "Доступные комманды:";
+	cout << "\n'+' - Сложение\n";
+	cout << "'-' - Вычитание\n";
+	cout << "'*' - Умножение\n";
+	cout << "'/' - Деление\n";
+	cout << "'e' - Выход\n";
+	cout << "Введите команду: ";
 }
+
 void Summa(float* mas)
 {
-    sep();
-    cout << "Сложение: a + b\n"; // формула
+	sep();
+	cout << "Сложение: a + b\n";
 
-    // ввод чисел
-    cout << "Введите а: ";
-    cin >> mas[0]; // первый элемент массива - a
-    cout << "Введите b: ";
-    cin >> mas[1]; // второй элемент массива - b
+	cout << "Введите a: ";
+	if (!GetFloat(mas[0])) return;
 
-    mas[3] = mas[0] + mas[1]; // четвертый элемент массива - answer
-    cout << mas[0] << " + " << mas[1] << " = " << mas[3] << endl;
-    sep();
+	cout << "Введите b: ";
+	if (!GetFloat(mas[1])) return;
+
+	mas[3] = mas[0] + mas[1];
+	cout << "Результат: " << mas[0] << " + " << " = " << mas[3] << endl;
+	stats[0]++;
+	sep();
 }
-void Minus(float* mas) 
+
+void Minus(float* mas)
 {
-    sep();
-    cout << "Вычитание: a - b\n"; // формула
+	sep();
+	cout << "Вычитание: a - b\n";
 
-    // ввод чисел
-    cout << "Введите а: ";
-    cin >> mas[0];
-    cout << "Введите b: ";
-    cin >> mas[1];
+	cout << "Введите а: ";
+	if (!GetFloat(mas[0])) return;
 
-    mas[3] = mas[0] - mas[1];
-    cout << mas[0] << " - " << mas[1] << " = " << mas[3] << endl;
-    sep();
+	cout << "Введите b: ";
+	if (!GetFloat(mas[1])) return;
+
+	mas[3] = mas[0] - mas[1];
+	cout << "Результат: " << mas[0] << " - " << mas[1] << " = " << mas[3] << endl;
+
+	stats[1];
+	sep();
 }
+
 void Multiply(float* mas)
 {
-    sep();
-    cout << "Умножение: a * b\n"; // формула
+	sep();
+	cout << "Умножение: a * b\n";
 
-    // ввод чисел
-    cout << "Введите а: ";
-    cin >> mas[0];
-    cout << "Введите b: ";
-    cin >> mas[1];
+	cout << "Введите а: ";
+	if (!GetFloat(mas[0])) return;
 
-    mas[3] = mas[0] * mas[1];
-    cout << mas[0] << " * " << mas[1] << " = " << mas[3] << endl;
-    sep();
+	cout << "Введите b: ";
+	if (!GetFloat(mas[1])) return;
+
+	mas[3] = mas[0] * mas[1];
+	cout << "Результат: " << mas[0] << " * " << mas[1] << " = " << mas[3] << endl;
+
+	stats[2]++;
+	sep();
 }
+
 void Divide(float* mas)
 {
-    sep();
-    cout << "Деление: a / b\n"; // формула
+	sep();
+	cout << "Деление: a / b\n";
 
-    // ввод чисел
-    cout << "Введите а: ";
-    cin >> mas[0];
-    cout << "Введите b: ";
-    cin >> mas[1];
-    if (mas[1] != 0)
-    {
-        // вывод ответа
-        mas[3] = mas[0] / mas[1];
-        cout << mas[0] << " / " << mas[1] << " = " << mas[3] << endl;
-    }
-    else
-        cout << "Ошибка: делить на ноль нельзя\n";
-    sep();
+	cout << "Введите а: ";
+	if (!GetFloat(mas[0])) return;
+
+	cout << "Введите b: ";
+	if (!GetFloat(mas[1])) return;
+
+	if (mas[1] != 0)
+	{
+		mas[3] = mas[0] / mas[1];
+		cout << "Результат: " << mas[0] << " / " << mas[1] << " = " << mas[3] << endl;
+		stats[3]++;
+	}
+	else
+	{
+		cout << "Ошибка: делить на ноль нельзя!\n";
+		stats[4]++;
+	}
+	sep();
 }
-bool Escape()
-{
-    sep();
-    cout << "Выход из программы...\n";
-    cout << "До встречи, пользователь!";
-    sep();
-    return false;
-}
+
+// ============================================================================
+// УТИЛИТЫ
+// ============================================================================
 void sep()
 {
-    cout << "\n-------------------\n\n";
+	cout << "\n-------------------\n\n";
 }
-void MassivVal(float* mas)
+
+bool GetFloat(float& value)
 {
-    sep();
-    cout << "a - " << mas[0] << endl;
-    cout << "b - " << mas[1] << endl;
-    cout << "c - " << mas[2] << endl;
-    cout << "Last answer - " << mas[3] << endl;
-    cout << "Discr - " << mas[4] << endl;
-    sep();
+	if (cin >> value)
+	{
+		return true;
+	}
+	else
+	{
+		cout << "Ошибка: введите корректное число!\n";
+		cin.clear();
+		cin.ignore(32767, '\n');
+		return false;
+	}
+}
+
+bool Escape()
+{
+	sep();
+	cout << "Выход из программы...\n";
+	cout << "До встречи, пользователь!";
+	sep();
+	return false;
+}
+// ============================================================================
+// DEBUG MODE
+// ============================================================================
+bool EnterDebugMode()
+{
+	const int MAX_ATMP = 3;
+	int attemps = 0;
+	string input;
+
+	sep();
+	cout << "ВХОД В DEBUG MODE\n";
+	while (attemps < MAX_ATMP)
+	{
+		cout << "Введите пароль (попытка " << (attemps + 1) << " из " << MAX_ATMP << "): ";
+		cin >> input;
+
+		if (input == PASSWORD)
+		{
+			cout << "Доступ разрешён!\n";
+			return true;
+		}
+		else
+		{
+			cout << "Неверный пароль!\n";
+			attemps++;
+		}
+	}
+
+	cout << " Превышено количество попыток. Доступ заблокирован\n";
+	stats[4]++;
+	sep();
+	return false;
+}
+void DebugMode(float* mas)
+{
+	bool inDebug = true;
+	char debugCMD;
+
+	while (inDebug)
+	{
+		sep();
+		cout << "DEBUG MODE MENU";
+		cout << "\n[1] Просмотр массива (in progress)\n";
+		cout << "[2] Статистика вычислений (in progress)\n";
+		cout << "[3] Общая статистика (in progress)\n";
+		cout << "[4] История вычислений (in progress)\n";
+		cout << "[0] Выход из debug mode\n";
+		cout << "Введите команду: ";
+		cin >> debugCMD;
+
+		switch (debugCMD)
+		{
+		case '0': inDebug = QuitDebugMode();
+		}
+	}
+}
+bool QuitDebugMode()
+{
+	cout << "\n=======================\n";
+	cout << "ВЫ ВЫШЛИ ИЗ DEBUG MODE";
+	cout << "\n=======================\n";
+	return false;
 }

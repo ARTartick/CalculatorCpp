@@ -1,5 +1,5 @@
 /*
-	Calculator v1.5.4 - Debug Mode
+	Calculator v1.5.5 - Debug Mode
 	Major:
 	1) переписан весь код с нуля
 	2) выдаёт ошибку, если вписать не число
@@ -10,6 +10,7 @@
 	2) исправлены баги, добавлена команда для очистки экрана
 	3) сделана команда [1] в debug-mode
 	4) сделана команда [2] в debug-mode
+	5) сделана команда [3] в debug-mode, добавил прикольный цвеной текст^^
 */
 
 #include <iostream>
@@ -23,7 +24,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.4";
+const string VERSION = "1.5.5";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -47,6 +48,7 @@ bool QuitDebugMode();
 void DebugMode(float* mas, int* stat);
 void ShowArray(float* mas);
 void CalcStats(int* stats);
+void GeneralStats(int* stats);
 
 // Утилиты
 void sep();
@@ -93,7 +95,7 @@ int main()
 		case 'e': is_works = Escape(); break;
 		case 'c': ClearCMD(); break;
 		default:
-			cout << "Ошибка: неизвестная команда\n"; stats[4]++;
+			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; stats[4]++;
 		}
 	}
 
@@ -188,7 +190,7 @@ void Divide(float* mas)
 	}
 	else
 	{
-		cout << "Ошибка: делить на ноль нельзя!\n";
+		cout << "\033[91mОшибка: делить на ноль нельзя!\033[0m\n";
 		stats[4]++;
 	}
 	sep();
@@ -269,7 +271,7 @@ bool EnterDebugMode()
 		}
 	}
 
-	cout << " Превышено количество попыток. Доступ заблокирован\n";
+	cout << "\033[91mПревышено количество попыток. Доступ заблокирован\033[0m\n";
 	stats[4]++;
 	sep();
 	return false;
@@ -285,7 +287,7 @@ void DebugMode(float* mas, int* stat)
 		cout << "DEBUG MODE MENU";
 		cout << "\n[1] Просмотр массива\n";
 		cout << "[2] Статистика вычислений\n";
-		cout << "[3] Общая статистика (in progress)\n";
+		cout << "[3] Общая статистика\n";
 		cout << "[4] История вычислений (in progress)\n";
 		cout << "[0] Выход из debug mode\n";
 		cout << "Введите команду: ";
@@ -296,6 +298,8 @@ void DebugMode(float* mas, int* stat)
 		case '0': inDebug = QuitDebugMode(); break;
 		case '1': ShowArray(mas); break;
 		case '2': CalcStats(stat); break;
+		case '3': GeneralStats(stat); break;
+		default: cout << "\033[91mError: Incorrect cmd\033[0m\n";
 		}
 	}
 }
@@ -322,9 +326,30 @@ void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
 
-	cout << "All operations: " << stats[0] + stats[1] + stats[2] + stats[3] << endl;
+	cout << "Total operations: " << stats[0] + stats[1] + stats[2] + stats[3] << endl;
 	cout << "Addition: " << stats[0] << endl;
 	cout << "Substraction: " << stats[1] << endl;
 	cout << "Multiplication: " << stats[2] << endl;
 	cout << "Division: " << stats[3] << endl;
+}
+void GeneralStats(int* stats)
+{
+	cout << "\n=GeneralStats\n";
+
+	time_t now = time(nullptr);
+	double dur = difftime(now, session_start);
+
+	int min = (int)dur / 60;
+	int sec = (int)dur % 60;
+
+	int total = stats[0] + stats[1] + stats[2] + stats[3];
+
+	cout << "Session duration: " << min << "min " << sec << "sec" << endl;
+	cout << "Total operations: " << total << endl;
+	cout << "Total errors: " << stats[4] << endl;
+	if (total > 0)
+	{
+		int accuracy = 100 - (stats[4] * 100 / total);
+		cout << "Точность: " << accuracy << "%\n";
+	}
 }

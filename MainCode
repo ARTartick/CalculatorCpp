@@ -1,5 +1,5 @@
 /*
-	Calculator v1.5.3 - Debug Mode
+	Calculator v1.5.4 - Debug Mode
 	Major:
 	1) переписан весь код с нуля
 	2) выдаёт ошибку, если вписать не число
@@ -9,6 +9,7 @@
 	1) исправлены критические баги, переработана функция GetFloat()
 	2) исправлены баги, добавлена команда для очистки экрана
 	3) сделана команда [1] в debug-mode
+	4) сделана команда [2] в debug-mode
 */
 
 #include <iostream>
@@ -22,7 +23,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.3";
+const string VERSION = "1.5.4";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -43,8 +44,9 @@ void Divide(float* mas);
 // Debug-режим
 bool EnterDebugMode();
 bool QuitDebugMode();
-void DebugMode(float* mas);
+void DebugMode(float* mas, int* stat);
 void ShowArray(float* mas);
+void CalcStats(int* stats);
 
 // Утилиты
 void sep();
@@ -52,9 +54,9 @@ float GetFloat();
 bool Escape();
 void ClearCMD();
 
-//==========================================================
+//===================================
 // MAIN
-//==========================================================
+//===================================
 int main()
 {
 	setlocale(LC_ALL, "RU");
@@ -85,13 +87,13 @@ int main()
 		case 'd':
 			if (EnterDebugMode())
 			{
-				DebugMode(massive);
+				DebugMode(massive, stats);
 			}
 			break;
 		case 'e': is_works = Escape(); break;
 		case 'c': ClearCMD(); break;
 		default:
-			cout << "Неизвестная команда\n";
+			cout << "Ошибка: неизвестная команда\n"; stats[4]++;
 		}
 	}
 
@@ -272,7 +274,7 @@ bool EnterDebugMode()
 	sep();
 	return false;
 }
-void DebugMode(float* mas)
+void DebugMode(float* mas, int* stat)
 {
 	bool inDebug = true;
 	char debugCMD;
@@ -282,7 +284,7 @@ void DebugMode(float* mas)
 		sep();
 		cout << "DEBUG MODE MENU";
 		cout << "\n[1] Просмотр массива\n";
-		cout << "[2] Статистика вычислений (in progress)\n";
+		cout << "[2] Статистика вычислений\n";
 		cout << "[3] Общая статистика (in progress)\n";
 		cout << "[4] История вычислений (in progress)\n";
 		cout << "[0] Выход из debug mode\n";
@@ -293,6 +295,7 @@ void DebugMode(float* mas)
 		{
 		case '0': inDebug = QuitDebugMode(); break;
 		case '1': ShowArray(mas); break;
+		case '2': CalcStats(stat); break;
 		}
 	}
 }
@@ -300,7 +303,7 @@ bool QuitDebugMode()
 {
 	cout << "\n=======================\n";
 	cout << "ВЫ ВЫШЛИ ИЗ DEBUG MODE";
-	cout << "\n=======================\n";
+	cout << "\n=======================\n\n";
 	return false;
 }
 void ShowArray(float* mas)
@@ -314,4 +317,14 @@ void ShowArray(float* mas)
 	cout << "Last second Answer: " << mas[4] << endl;
 	cout << "Discr: " << mas[5] << endl;
 
+}
+void CalcStats(int* stats)
+{
+	cout << "\n=CalcStats\n";
+
+	cout << "All operations: " << stats[0] + stats[1] + stats[2] + stats[3] << endl;
+	cout << "Addition: " << stats[0] << endl;
+	cout << "Substraction: " << stats[1] << endl;
+	cout << "Multiplication: " << stats[2] << endl;
+	cout << "Division: " << stats[3] << endl;
 }

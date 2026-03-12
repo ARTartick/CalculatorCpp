@@ -1,5 +1,5 @@
 /*
-	Calculator v1.5.6 - Debug Mode
+	Calculator v1.5.7 - Debug Mode
 	Major:
 	1) переписан весь код с нуля
 	2) выдаёт ошибку, если вписать не число
@@ -12,6 +12,7 @@
 	4) сделана команда [2] в debug-mode
 	5) сделана команда [3] в debug-mode, добавил прикольный цвеной текст^^
 	6) сделана команда [4] в debug-mode, улучшил команду [3] там же
+	7) исправлено пару багов
 */
 
 #include <iostream>
@@ -21,12 +22,14 @@
 #include <limits>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
+
 using namespace std;
 
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.6";
+const string VERSION = "1.5.7";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -45,6 +48,7 @@ void Summa(float* mas);
 void Minus(float* mas);
 void Multiply(float* mas);
 void Divide(float* mas);
+
 // Debug-режим
 bool EnterDebugMode();
 bool QuitDebugMode();
@@ -60,6 +64,7 @@ float GetFloat();
 bool Escape();
 void ClearCMD();
 void AddHistory(string op);
+string FormatFloat(float val);
 
 //===================================
 // MAIN
@@ -138,7 +143,7 @@ void Summa(float* mas)
 	cout << "Результат: " << mas[0] << " + " << mas[1] << " = " << mas[3] << endl;
 
 	stats[0]++;
-	AddHistory(to_string(mas[0]) + " + " + to_string(mas[1]) + " = " + to_string(mas[3]));
+	AddHistory(FormatFloat(mas[0]) + " + " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
 	sep();
 }
 
@@ -157,7 +162,7 @@ void Minus(float* mas)
 	cout << "Результат: " << mas[0] << " - " << mas[1] << " = " << mas[3] << endl;
 
 	stats[1]++;
-	AddHistory(to_string(mas[0]) + " - " + to_string(mas[1]) + " = " + to_string(mas[3]));
+	AddHistory(FormatFloat(mas[0]) + " - " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
 	sep();
 }
 
@@ -176,7 +181,7 @@ void Multiply(float* mas)
 	cout << "Результат: " << mas[0] << " * " << mas[1] << " = " << mas[3] << endl;
 
 	stats[2]++;
-	AddHistory(to_string(mas[0]) + " * " + to_string(mas[1]) + " = " + to_string(mas[3]));
+	AddHistory(FormatFloat(mas[0]) + " * " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
 	sep();
 }
 
@@ -196,12 +201,13 @@ void Divide(float* mas)
 		mas[3] = mas[0] / mas[1];
 		cout << "Результат: " << mas[0] << " / " << mas[1] << " = " << mas[3] << endl;
 		stats[3]++;
+		AddHistory(FormatFloat(mas[0]) + " / " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
 	}
 	else
 	{
 		cout << "\033[91mОшибка: делить на ноль нельзя!\033[0m\n";
 		stats[4]++;
-		AddHistory(to_string(mas[0]) + " / " + to_string(mas[1]) + " = " + to_string(mas[3]));
+		AddHistory(FormatFloat(mas[0]) + " / " + FormatFloat(mas[1]) + " = " + "ERROR");
 	}
 	sep();
 }
@@ -261,6 +267,13 @@ void AddHistory(string op)
 	{
 		history.erase(history.begin());
 	}
+}
+
+string FormatFloat(float val)
+{
+	stringstream ss;
+	ss << fixed << setprecision(2) << val;  // 2 знака после запятой
+	return ss.str();
 }
 // ============================================================================
 // DEBUG MODE
@@ -379,8 +392,9 @@ void ShowHistory()
 	{
 		cout << "\033[91mИстория операций пока что пуста...\033[0m" << endl;
 	}
-	for (int i = history.size() - 1; i >= 0; i--)
+	int num = 1;
+	for (auto it = history.rbegin(); it != history.rend(); ++it, ++num)
 	{
-		cout << "[" << (history.size() - i) << "] " << history[i] << endl;
+		cout << "[" << num << "] " << *it << endl;
 	}
 }

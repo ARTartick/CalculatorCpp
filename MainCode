@@ -1,18 +1,8 @@
 /*
-	Calculator v1.5.7 - Debug Mode
+	Calculator v1.6.0 - Debug Mode
 	Major:
-	1) переписан весь код с нуля
-	2) выдаёт ошибку, если вписать не число
-	3) теперь чуть покрасивее
-	4) DEBUG-MODE (in progress)
-	Minor:
-	1) исправлены критические баги, переработана функция GetFloat()
-	2) исправлены баги, добавлена команда для очистки экрана
-	3) сделана команда [1] в debug-mode
-	4) сделана команда [2] в debug-mode
-	5) сделана команда [3] в debug-mode, добавил прикольный цвеной текст^^
-	6) сделана команда [4] в debug-mode, улучшил команду [3] там же
-	7) исправлено пару багов
+	1) Добвил enum для главного массива
+	2) добваил возведение в степень
 */
 
 #include <iostream>
@@ -23,21 +13,27 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
-
+#include <cmath>
 using namespace std;
 
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.5.7";
+const string VERSION = "1.6.0";
 const string PASSWORD = "admin123";
 
 //===================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 //===================================
-int stats[5];
+int stats[6]; // 0 - add, 1 - min, 2 - mult, 3 - div, 4 - err, 5 - pow
 time_t session_start;
 vector<string> history;
+
+// Перечисление
+enum MassiveNumbers
+{
+	A, B, C, ANS, X2, DISCR
+};
 
 //===================================
 // ПРОТОТИПЫ ФУНКЦИЙ
@@ -48,7 +44,7 @@ void Summa(float* mas);
 void Minus(float* mas);
 void Multiply(float* mas);
 void Divide(float* mas);
-
+void Power(float* mas);
 // Debug-режим
 bool EnterDebugMode();
 bool QuitDebugMode();
@@ -104,6 +100,7 @@ int main()
 			break;
 		case 'e': is_works = Escape(); break;
 		case 'c': ClearCMD(); break;
+		case 'p': Power(massive); break;
 		default:
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; stats[4]++;
 		}
@@ -123,6 +120,7 @@ void SayHello()
 	cout << "'-' - Вычитание\n";
 	cout << "'*' - Умножение\n";
 	cout << "'/' - Деление\n";
+	cout << "'p' - Возведение в степень\n";
 	cout << "'c' - Очистить экран\n";
 	cout << "'e' - Выход\n";
 	cout << "Введите команду: ";
@@ -134,16 +132,16 @@ void Summa(float* mas)
 	cout << "Сложение: a + b\n";
 
 	cout << "Введите a: ";
-	mas[0] = GetFloat();
+	mas[A] = GetFloat();
 
 	cout << "Введите b: ";
-	mas[1] = GetFloat();
+	mas[B] = GetFloat();
 
-	mas[3] = mas[0] + mas[1];
-	cout << "Результат: " << mas[0] << " + " << mas[1] << " = " << mas[3] << endl;
+	mas[ANS] = mas[A] + mas[B];
+	cout << "Результат: " << mas[A] << " + " << mas[B] << " = " << mas[ANS] << endl;
 
 	stats[0]++;
-	AddHistory(FormatFloat(mas[0]) + " + " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
+	AddHistory(FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
 
@@ -153,16 +151,16 @@ void Minus(float* mas)
 	cout << "Вычитание: a - b\n";
 
 	cout << "Введите а: ";
-	mas[0] = GetFloat();
+	mas[A] = GetFloat();
 
 	cout << "Введите b: ";
-	mas[1] = GetFloat();
+	mas[B] = GetFloat();
 
-	mas[3] = mas[0] - mas[1];
-	cout << "Результат: " << mas[0] << " - " << mas[1] << " = " << mas[3] << endl;
+	mas[ANS] = mas[A] - mas[B];
+	cout << "Результат: " << mas[A] << " - " << mas[B] << " = " << mas[ANS] << endl;
 
 	stats[1]++;
-	AddHistory(FormatFloat(mas[0]) + " - " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
+	AddHistory(FormatFloat(mas[A]) + " - " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[3]));
 	sep();
 }
 
@@ -172,16 +170,16 @@ void Multiply(float* mas)
 	cout << "Умножение: a * b\n";
 
 	cout << "Введите а: ";
-	mas[0] = GetFloat();
+	mas[A] = GetFloat();
 
 	cout << "Введите b: ";
-	mas[1] = GetFloat();
+	mas[B] = GetFloat();
 
-	mas[3] = mas[0] * mas[1];
-	cout << "Результат: " << mas[0] << " * " << mas[1] << " = " << mas[3] << endl;
+	mas[ANS] = mas[A] * mas[B];
+	cout << "Результат: " << mas[A] << " * " << mas[B] << " = " << mas[ANS] << endl;
 
 	stats[2]++;
-	AddHistory(FormatFloat(mas[0]) + " * " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
+	AddHistory(FormatFloat(mas[A]) + " * " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
 
@@ -191,24 +189,44 @@ void Divide(float* mas)
 	cout << "Деление: a / b\n";
 
 	cout << "Введите а: ";
-	mas[0] = GetFloat();
+	mas[A] = GetFloat();
 
 	cout << "Введите b: ";
-	mas[1] = GetFloat();
+	mas[B] = GetFloat();
 
-	if (mas[1] != 0)
+	if (mas[B] != 0)
 	{
-		mas[3] = mas[0] / mas[1];
-		cout << "Результат: " << mas[0] << " / " << mas[1] << " = " << mas[3] << endl;
+		mas[ANS] = mas[A] / mas[B];
+		cout << "Результат: " << mas[A] << " / " << mas[B] << " = " << mas[ANS] << endl;
 		stats[3]++;
-		AddHistory(FormatFloat(mas[0]) + " / " + FormatFloat(mas[1]) + " = " + FormatFloat(mas[3]));
+		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	}
 	else
 	{
 		cout << "\033[91mОшибка: делить на ноль нельзя!\033[0m\n";
 		stats[4]++;
-		AddHistory(FormatFloat(mas[0]) + " / " + FormatFloat(mas[1]) + " = " + "ERROR");
+		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + "ERROR");
 	}
+	sep();
+}
+
+void Power(float* mas)
+{
+	sep();
+	cout << "Возведение в степень: a^^b\n";
+
+	cout << "Введите а: ";
+	mas[A] = GetFloat();
+
+	cout << "Введите b: ";
+	mas[B] = GetFloat();
+
+
+	mas[ANS] = pow(mas[A], mas[B]);
+	cout << "Результат: " << mas[A] << "^^" << mas[B] << " = " << mas[ANS] << endl;
+
+	stats[5]++;
+	AddHistory(FormatFloat(mas[A]) + "^^" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
 
@@ -322,6 +340,7 @@ void DebugMode(float* mas, int* stat)
 		cout << "[3] Общая статистика\n";
 		cout << "[4] История вычислений\n";
 		cout << "[0] Выход из debug mode\n";
+
 		cout << "Введите команду: ";
 		cin >> debugCMD;
 
@@ -332,7 +351,7 @@ void DebugMode(float* mas, int* stat)
 		case '2': CalcStats(stat); break;
 		case '3': GeneralStats(stat); break;
 		case '4': ShowHistory(); break;
-		default: cout << "\033[91mError: Incorrect cmd\033[0m\n";
+		default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stat[4]++;
 		}
 	}
 }
@@ -347,23 +366,24 @@ void ShowArray(float* mas)
 {
 	cout << "\n=ShowArray\n";
 
-	cout << "a: " << mas[0] << endl;
-	cout << "b: " << mas[1] << endl;
-	cout << "c: " << mas[2] << endl;
-	cout << "Last Answer: " << mas[3] << endl;
-	cout << "Last second Answer: " << mas[4] << endl;
-	cout << "Discr: " << mas[5] << endl;
+	cout << "a: " << mas[A] << endl;
+	cout << "b: " << mas[B] << endl;
+	cout << "c: " << mas[C] << endl;
+	cout << "Last Answer: " << mas[ANS] << endl;
+	cout << "Last second Answer: " << mas[X2] << endl;
+	cout << "Discr: " << mas[DISCR] << endl;
 
 }
 void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
 
-	cout << "Total operations: " << stats[0] + stats[1] + stats[2] + stats[3] << endl;
+	cout << "Total operations: " << stats[0] + stats[1] + stats[2] + stats[3] + stats[5] << endl;
 	cout << "Addition: " << stats[0] << endl;
 	cout << "Substraction: " << stats[1] << endl;
 	cout << "Multiplication: " << stats[2] << endl;
 	cout << "Division: " << stats[3] << endl;
+	cout << "Power: " << stats[5] << endl;
 }
 void GeneralStats(int* stats)
 {
@@ -375,7 +395,7 @@ void GeneralStats(int* stats)
 	int min = (int)dur / 60;
 	int sec = (int)dur % 60;
 
-	int total = stats[0] + stats[1] + stats[2] + stats[3];
+	int total = stats[0] + stats[1] + stats[2] + stats[3] + stats[5];
 
 	cout << "Programming language: C++\n";
 	cout << "Name: CALCULATORcpp\n";

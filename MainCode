@@ -1,8 +1,8 @@
 /*
-	Calculator v1.6.0 - Debug Mode
-	Major:
+	Calculator v1.6.1
 	1) Добвил enum для главного массива
 	2) добваил возведение в степень
+	3) Добавил enum для статов
 */
 
 #include <iostream>
@@ -19,7 +19,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.6.0";
+const string VERSION = "1.6.1";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -33,6 +33,10 @@ vector<string> history;
 enum MassiveNumbers
 {
 	A, B, C, ANS, X2, DISCR
+};
+enum StatNumbers
+{
+	ADD, MIN, MULT, DIV, ERR, POW
 };
 
 //===================================
@@ -140,7 +144,7 @@ void Summa(float* mas)
 	mas[ANS] = mas[A] + mas[B];
 	cout << "Результат: " << mas[A] << " + " << mas[B] << " = " << mas[ANS] << endl;
 
-	stats[0]++;
+	stats[ADD]++;
 	AddHistory(FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
@@ -159,7 +163,7 @@ void Minus(float* mas)
 	mas[ANS] = mas[A] - mas[B];
 	cout << "Результат: " << mas[A] << " - " << mas[B] << " = " << mas[ANS] << endl;
 
-	stats[1]++;
+	stats[MIN]++;
 	AddHistory(FormatFloat(mas[A]) + " - " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[3]));
 	sep();
 }
@@ -178,7 +182,7 @@ void Multiply(float* mas)
 	mas[ANS] = mas[A] * mas[B];
 	cout << "Результат: " << mas[A] << " * " << mas[B] << " = " << mas[ANS] << endl;
 
-	stats[2]++;
+	stats[MULT]++;
 	AddHistory(FormatFloat(mas[A]) + " * " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
@@ -198,13 +202,13 @@ void Divide(float* mas)
 	{
 		mas[ANS] = mas[A] / mas[B];
 		cout << "Результат: " << mas[A] << " / " << mas[B] << " = " << mas[ANS] << endl;
-		stats[3]++;
+		stats[DIV]++;
 		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	}
 	else
 	{
 		cout << "\033[91mОшибка: делить на ноль нельзя!\033[0m\n";
-		stats[4]++;
+		stats[ERR]++;
 		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + "ERROR");
 	}
 	sep();
@@ -225,7 +229,7 @@ void Power(float* mas)
 	mas[ANS] = pow(mas[A], mas[B]);
 	cout << "Результат: " << mas[A] << "^^" << mas[B] << " = " << mas[ANS] << endl;
 
-	stats[5]++;
+	stats[POW]++;
 	AddHistory(FormatFloat(mas[A]) + "^^" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
@@ -322,7 +326,7 @@ bool EnterDebugMode()
 	}
 
 	cout << "\033[91mПревышено количество попыток. Доступ заблокирован\033[0m\n";
-	stats[4]++;
+	stats[ERR]++;
 	sep();
 	return false;
 }
@@ -340,7 +344,6 @@ void DebugMode(float* mas, int* stat)
 		cout << "[3] Общая статистика\n";
 		cout << "[4] История вычислений\n";
 		cout << "[0] Выход из debug mode\n";
-
 		cout << "Введите команду: ";
 		cin >> debugCMD;
 
@@ -351,7 +354,7 @@ void DebugMode(float* mas, int* stat)
 		case '2': CalcStats(stat); break;
 		case '3': GeneralStats(stat); break;
 		case '4': ShowHistory(); break;
-		default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stat[4]++;
+		default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stat[ERR]++;
 		}
 	}
 }
@@ -378,13 +381,14 @@ void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
 
-	cout << "Total operations: " << stats[0] + stats[1] + stats[2] + stats[3] + stats[5] << endl;
-	cout << "Addition: " << stats[0] << endl;
-	cout << "Substraction: " << stats[1] << endl;
-	cout << "Multiplication: " << stats[2] << endl;
-	cout << "Division: " << stats[3] << endl;
-	cout << "Power: " << stats[5] << endl;
+	cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] << endl;
+	cout << "Addition: " << stats[ADD] << endl;
+	cout << "Substraction: " << stats[MIN] << endl;
+	cout << "Multiplication: " << stats[MULT] << endl;
+	cout << "Division: " << stats[DIV] << endl;
+	cout << "Power: " << stats[POW] << endl;
 }
+
 void GeneralStats(int* stats)
 {
 	cout << "\n=GeneralStats\n";
@@ -395,15 +399,16 @@ void GeneralStats(int* stats)
 	int min = (int)dur / 60;
 	int sec = (int)dur % 60;
 
-	int total = stats[0] + stats[1] + stats[2] + stats[3] + stats[5];
+	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW];
 
 	cout << "Programming language: C++\n";
 	cout << "Name: CALCULATORcpp\n";
 	cout << "Version: " << VERSION << endl;
 	cout << "Session duration: " << min << "min " << sec << "sec" << endl;
 	cout << "Total operations: " << total << endl;
-	cout << "Total errors: " << stats[4] << endl;
+	cout << "Total errors: " << stats[ERR] << endl;
 }
+
 void ShowHistory()
 {
 	cout << "\n=ShowHistory\n";

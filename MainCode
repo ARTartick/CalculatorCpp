@@ -1,9 +1,6 @@
 /*
-	Calculator v1.6.2
-	1) Добвил enum для главного массива
-	2) добваил возведение в степень
-	3) Добавил enum для статов
-	4) Добавил квадратные корни
+	Calculator v1.7.0
+	1) Полностью реализовал квадратные уравнения
 */
 
 #include <iostream>
@@ -20,13 +17,13 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.6.2";
+const string VERSION = "1.7.0";
 const string PASSWORD = "admin123";
 
 //===================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 //===================================
-int stats[6]; // 0 - add, 1 - min, 2 - mult, 3 - div, 4 - err, 5 - pow
+int stats[7]; // 0 - add, 1 - min, 2 - mult, 3 - div, 4 - err, 5 - pow, 6 - quad
 time_t session_start;
 vector<string> history;
 
@@ -37,7 +34,7 @@ enum MassiveNumbers
 };
 enum StatNumbers
 {
-	ADD, MIN, MULT, DIV, ERR, POW, SQRT
+	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD
 };
 
 //===================================
@@ -51,6 +48,8 @@ void Multiply(float* mas);
 void Divide(float* mas);
 void Power(float* mas);
 void SquareRoot(float* mas);
+float Discr(float* mas);
+void Quad(float* mas);
 // Debug-режим
 bool EnterDebugMode();
 bool QuitDebugMode();
@@ -108,6 +107,7 @@ int main()
 		case 'c': ClearCMD(); break;
 		case 'p': Power(massive); break;
 		case 's': SquareRoot(massive); break;
+		case 'q': Quad(massive); break;
 		default:
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; stats[4]++;
 		}
@@ -129,6 +129,7 @@ void SayHello()
 	cout << "'/' - Деление\n";
 	cout << "'p' - Возведение в степень\n";
 	cout << "'s' - Квадратный корень\n";
+	cout << "'q' - Квадратное уравнение\n";
 	cout << "'c' - Очистить экран\n";
 	cout << "'e' - Выход\n";
 	cout << "Введите команду: ";
@@ -252,6 +253,65 @@ void SquareRoot(float* mas)
 	stats[SQRT]++;
 	AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
 	sep();
+}
+
+float Discr(float* masiv)
+{
+	AddHistory(FormatFloat(masiv[B]) + "^^2 - 4 * " + FormatFloat(masiv[A]) + " * " + FormatFloat(masiv[C]) + " = " + FormatFloat(masiv[DISCR]));
+	return (pow(masiv[B], 2) - (4 * masiv[A] * masiv[C]));
+}
+
+void Quad(float* mas)
+{
+	sep();
+	cout << "Квадратное уравнение: ax^^2 + bx + c = 0\n";
+
+	cout << "Введите a: ";
+	mas[A] = GetFloat();
+	cout << "Введите b: ";
+	mas[B] = GetFloat();
+	cout << "Введите c: ";
+	mas[C] = GetFloat();
+
+	mas[DISCR] = Discr(mas);
+	cout << "Дисриминант равен " << mas[DISCR] << endl;
+
+	if (mas[DISCR] == 0)
+	{
+		cout << "Следовательно уравнение имеет 1 действительный корень\n";
+
+		mas[ANS] = (-1 * mas[B]) / (2 * mas[A]);
+		cout << "(-1 * " << mas[B] << ") / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+		cout << "x1 = " << mas[ANS] << endl;
+		AddHistory("(-1 * " + FormatFloat(mas[B]) + ") / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
+		stats[QUAD]++;
+		sep();
+	}
+	else if (mas[DISCR] > 0)
+	{
+		cout << "Следовательно уравнение имеет 2 действительных корня\n";
+
+		mas[ANS] = ((-1 * mas[B]) + sqrt(mas[DISCR])) / (2 * mas[A]);
+		cout << "(-1 * " << mas[B] << ") + √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+		mas[X2] = ((-1 * mas[B]) - sqrt(mas[DISCR])) / (2 * mas[A]);
+		cout << "(-1 * " << mas[B] << ") - √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+
+		cout << "x1 = " << mas[ANS] << endl;
+		cout << "x2 = " << mas[X2] << endl;
+
+		AddHistory("(-1 * " + FormatFloat(mas[B]) + ") + √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
+		AddHistory("(-1 * " + FormatFloat(mas[B]) + ") - √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[X2]));
+		stats[QUAD]++;
+		sep();
+	}
+	else
+	{
+		cout << "Следовательно уравнение не имеет действительных корней\n";
+
+		AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^^ + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
+		stats[QUAD]++;
+		sep();
+	}
 }
 
 // ============================================================================
@@ -401,13 +461,14 @@ void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
 
-	cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] << endl;
+	cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] << endl;
 	cout << "Addition: " << stats[ADD] << endl;
 	cout << "Substraction: " << stats[MIN] << endl;
 	cout << "Multiplication: " << stats[MULT] << endl;
 	cout << "Division: " << stats[DIV] << endl;
 	cout << "Power: " << stats[POW] << endl;
 	cout << "Square Root: " << stats[SQRT] << endl;
+	cout << "Quadratic Equation: " << stats[QUAD] << endl;
 }
 void GeneralStats(int* stats)
 {
@@ -419,7 +480,7 @@ void GeneralStats(int* stats)
 	int min = (int)dur / 60;
 	int sec = (int)dur % 60;
 
-	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT];
+	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD];
 
 	cout << "Programming language: C++\n";
 	cout << "Name: CALCULATORcpp\n";

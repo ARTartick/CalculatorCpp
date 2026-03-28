@@ -1,4 +1,4 @@
 # CalculatorCpp
 It's my cool Calculator in C++
 
-functions: +, -, *, /, c, e, d
+functions: +, -, *, /, p, s, c, e, d

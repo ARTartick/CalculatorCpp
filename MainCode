@@ -1,6 +1,7 @@
 /*
-	Calculator v1.7.0
+	Calculator v1.7.1
 	1) Полностью реализовал квадратные уравнения
+	2) поправил ошибку при отрицательном корне
 */
 
 #include <iostream>
@@ -17,7 +18,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.7.0";
+const string VERSION = "1.7.1";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -247,11 +248,20 @@ void SquareRoot(float* mas)
 	cout << "Введите a: ";
 	mas[A] = GetFloat();
 
-	mas[ANS] = sqrt(mas[A]);
-	cout << "Результат: √" << mas[A] << " = " << mas[ANS] << endl;
+	if (mas[A] < 0)
+	{
+		cout << "Результат: √" << mas[A] << " = " << abs(mas[A]) << "i" << endl;
+		stats[SQRT]++;
+		AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(abs(mas[A])) + "i");
+	}
+	else
+	{
+		mas[ANS] = sqrt(mas[A]);
+		cout << "Результат: √" << mas[A] << " = " << mas[ANS] << endl;
 
-	stats[SQRT]++;
-	AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		stats[SQRT]++;
+		AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+	}
 	sep();
 }
 

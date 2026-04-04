@@ -1,7 +1,8 @@
 /*
-	Calculator v1.7.1
+	Calculator v1.7.2
 	1) Полностью реализовал квадратные уравнения
 	2) поправил ошибку при отрицательном корне
+	3) переход от буквенных к строковым коммандам
 */
 
 #include <iostream>
@@ -18,7 +19,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.7.1";
+const string VERSION = "1.7.2";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -77,7 +78,7 @@ int main()
 	session_start = time(nullptr); // запуск таймера сессии
 
 	// переменные
-	char command;
+	string command;
 	bool is_works = true;
 	float massive[6] = { 0, 0, 0, 0, 0, 0 };
 
@@ -92,25 +93,42 @@ int main()
 		SayHello();
 		cin >> command;
 
-		switch (command)
+		// основные операции
+		if (command == "+")
+			Summa(massive);
+		else if (command == "-")
+			Minus(massive);
+		else if (command == "*")
+			Multiply(massive);
+		else if (command == "/")
+			Divide(massive);
+
+		// утилиты, дебаг, выход
+		else if (command == "d")
 		{
-		case '+': Summa(massive); break;
-		case '-': Minus(massive); break;
-		case '*': Multiply(massive); break;
-		case '/': Divide(massive); break;
-		case 'd':
 			if (EnterDebugMode())
 			{
 				DebugMode(massive, stats);
 			}
-			break;
-		case 'e': is_works = Escape(); break;
-		case 'c': ClearCMD(); break;
-		case 'p': Power(massive); break;
-		case 's': SquareRoot(massive); break;
-		case 'q': Quad(massive); break;
-		default:
-			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; stats[4]++;
+		}
+		else if (command == "esc")
+			is_works = Escape();
+		else if (command == "clr")
+			ClearCMD();
+
+		// продвинутые
+		else if (command == "pow")
+			Power(massive);
+		else if (command == "sqrt")
+			SquareRoot(massive);
+		else if (command == "quad")
+			Quad(massive);
+
+		// исключения
+		else
+		{
+			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; 
+			stats[4]++;
 		}
 	}
 
@@ -123,16 +141,17 @@ int main()
 // ============================================================================
 void SayHello()
 {
-	cout << "Доступные комманды:\n";
-	cout << "'+' - Сложение\n";
-	cout << "'-' - Вычитание\n";
-	cout << "'*' - Умножение\n";
-	cout << "'/' - Деление\n";
-	cout << "'p' - Возведение в степень\n";
-	cout << "'s' - Квадратный корень\n";
-	cout << "'q' - Квадратное уравнение\n";
-	cout << "'c' - Очистить экран\n";
-	cout << "'e' - Выход\n";
+	cout << "\nДоступные комманды:\n";
+	cout << "Сложение:                [+]\n";
+	cout << "Вычитание:               [-]\n";
+	cout << "Умножение:               [*]\n";
+	cout << "Деление:                 [/]\n";
+	cout << "Возведение в степень: [sqrt]\n";
+	cout << "Квадратный корень:     [pow]\n";
+	cout << "Квадратное уравнение: [quad]\n";
+	cout << "Очистить экран:        [clr]\n";
+	cout << "Выход:                 [esc]\n";
+	cout << "----------------------------\n";
 	cout << "Введите команду: ";
 }
 
@@ -370,6 +389,9 @@ void ClearCMD()
 #else
 	system("clear");
 #endif
+	cout << "++======================================++\n";
+	cout << "||   CalculatorCpp версии " << setw(10) << VERSION << "    ||\n";
+	cout << "++======================================++\n";
 }
 
 void AddHistory(string op) 
@@ -467,6 +489,7 @@ void ShowArray(float* mas)
 	cout << "Discr: " << mas[DISCR] << endl;
 
 }
+
 void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
@@ -480,6 +503,7 @@ void CalcStats(int* stats)
 	cout << "Square Root: " << stats[SQRT] << endl;
 	cout << "Quadratic Equation: " << stats[QUAD] << endl;
 }
+
 void GeneralStats(int* stats)
 {
 	cout << "\n=GeneralStats\n";
@@ -487,7 +511,7 @@ void GeneralStats(int* stats)
 	time_t now = time(nullptr);
 	double dur = difftime(now, session_start);
 
-	int min = (int)dur / 60;
+	int min = (int)dur / 60;  
 	int sec = (int)dur % 60;
 
 	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD];
@@ -499,6 +523,7 @@ void GeneralStats(int* stats)
 	cout << "Total operations: " << total << endl;
 	cout << "Total errors: " << stats[ERR] << endl;
 }
+
 void ShowHistory()
 {
 	cout << "\n=ShowHistory\n";

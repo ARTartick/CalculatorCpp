@@ -1,5 +1,5 @@
 /*
-	Calculator v1.7.5
+	Calculator v1.7.6
 	1) Полностью реализовал квадратные уравнения
 	2) поправил ошибку при отрицательном корне
 	3) переход от буквенных к строковым коммандам
@@ -7,6 +7,7 @@
 	5) сделал очистку при каждой новой команде
 	6) Теорема Пифагор
 	7) Баг фиксы
+	8) теперь стоит модуль на числа в теореме пифагора и катет не может быть больше гипотенузы
 */
 
 #include <iostream>
@@ -23,7 +24,7 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.7.4";
+const string VERSION = "1.7.6";
 const string PASSWORD = "admin123";
 
 //===================================
@@ -377,11 +378,18 @@ void PythagoreanTheorem(float* mas)
 		cout << "Теорема Пифагора: BC^^2 = AC^^2 - AB^^2\n";
 		cout << "Выберете, что хотите найти: " << num << endl;
 
-		cout << "Введите длину катета: ";
-		mas[A] = GetFloat();
 
 		cout << "Введите длину гипотенузы: ";
-		mas[C] = GetFloat();
+		mas[C] = abs(GetFloat());
+
+		cout << "Введите длину катета: ";
+		mas[A] = abs(GetFloat());
+
+		while (mas[A] > mas[C])
+		{
+			cout << "Катет не может быть больше гипотенузы, введите заново: ";
+			mas[A] = abs(GetFloat());
+		}
 
 		mas[ANS] = (pow(mas[C], 2) - pow(mas[A], 2));
 
@@ -399,10 +407,10 @@ void PythagoreanTheorem(float* mas)
 		cout << "Выберете, что хотите найти: " << num << endl;
 
 		cout << "Введите длину катета: ";
-		mas[A] = GetFloat();
+		mas[A] = abs(GetFloat());
 
 		cout << "Введите длину второго катета: ";
-		mas[B] = GetFloat();
+		mas[B] = abs(GetFloat());
 
 		mas[ANS] = pow(mas[A], 2) + pow(mas[B], 2);
 
@@ -565,6 +573,7 @@ void ShowArray(float* mas)
 	cout << "Discr: " << mas[DISCR] << endl;
 
 }
+
 void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
@@ -579,6 +588,7 @@ void CalcStats(int* stats)
 	cout << "Quadratic Equation: " << stats[QUAD] << endl;
 	cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 }
+
 void GeneralStats(int* stats)
 {
 	cout << "\n=GeneralStats\n";

@@ -1,11 +1,12 @@
 /*
-	Calculator v1.7.4
+	Calculator v1.7.5
 	1) Полностью реализовал квадратные уравнения
 	2) поправил ошибку при отрицательном корне
 	3) переход от буквенных к строковым коммандам
 	4) добавил новые значения командам
 	5) сделал очистку при каждой новой команде
-	6) Теорема Пифагора
+	6) Теорема Пифагор
+	7) Баг фиксы
 */
 
 #include <iostream>
@@ -198,7 +199,7 @@ void Minus(float* mas)
 	cout << "Результат: " << mas[A] << " - " << mas[B] << " = " << mas[ANS] << endl;
 
 	stats[MIN]++;
-	AddHistory(FormatFloat(mas[A]) + " - " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[3]));
+	AddHistory(FormatFloat(mas[A]) + " - " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 	sep();
 }
 
@@ -282,9 +283,10 @@ void SquareRoot(float* mas)
 
 	if (mas[A] < 0)
 	{
-		cout << "Результат: √" << mas[A] << " = " << abs(mas[A]) << "i" << endl;
+		mas[ANS] = sqrt(abs(mas[A]));
+		cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
 		stats[SQRT]++;
-		AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(abs(mas[A])) + "i");
+		AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]) + "i");
 	}
 	else
 	{
@@ -299,7 +301,7 @@ void SquareRoot(float* mas)
 
 float Discr(float* masiv)
 {
-	AddHistory(FormatFloat(masiv[B]) + "^^2 - 4 * " + FormatFloat(masiv[A]) + " * " + FormatFloat(masiv[C]) + " = " + FormatFloat(masiv[DISCR]));
+	AddHistory(FormatFloat(masiv[B]) + "^^2 - 4 * " + FormatFloat(masiv[A]) + " * " + FormatFloat(masiv[C]) + " = " + FormatFloat(pow(masiv[B], 2) - (4 * masiv[A] * masiv[C])));
 	return (pow(masiv[B], 2) - (4 * masiv[A] * masiv[C]));
 }
 
@@ -337,7 +339,7 @@ void Quad(float* mas)
 		mas[ANS] = ((-1 * mas[B]) + sqrt(mas[DISCR])) / (2 * mas[A]);
 		cout << "(-1 * " << mas[B] << ") + √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
 		mas[X2] = ((-1 * mas[B]) - sqrt(mas[DISCR])) / (2 * mas[A]);
-		cout << "(-1 * " << mas[B] << ") - √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+		cout << "(-1 * " << mas[B] << ") - √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[X2] << endl;
 
 		cout << "x1 = " << mas[ANS] << endl;
 		cout << "x2 = " << mas[X2] << endl;
@@ -376,10 +378,10 @@ void PythagoreanTheorem(float* mas)
 		cout << "Выберете, что хотите найти: " << num << endl;
 
 		cout << "Введите длину катета: ";
-		cin >> mas[A];
+		mas[A] = GetFloat();
 
 		cout << "Введите длину гипотенузы: ";
-		cin >> mas[C];
+		mas[C] = GetFloat();
 
 		mas[ANS] = (pow(mas[C], 2) - pow(mas[A], 2));
 
@@ -397,14 +399,14 @@ void PythagoreanTheorem(float* mas)
 		cout << "Выберете, что хотите найти: " << num << endl;
 
 		cout << "Введите длину катета: ";
-		cin >> mas[A];
+		mas[A] = GetFloat();
 
 		cout << "Введите длину второго катета: ";
-		cin >> mas[B];
+		mas[B] = GetFloat();
 
 		mas[ANS] = pow(mas[A], 2) + pow(mas[B], 2);
 
-		cout << "AC^^2 = " << pow(mas[A], 2) << " - " << pow(mas[B], 2) << " = " << mas[ANS] << endl;
+		cout << "AC^^2 = " << pow(mas[A], 2) << " + " << pow(mas[B], 2) << " = " << mas[ANS] << endl;
 		cout << "AC = √" << mas[ANS] << " или же " << sqrt(mas[ANS]);
 
 		AddHistory("AC = √" + FormatFloat(mas[ANS]) + " или же " + FormatFloat(sqrt(mas[ANS])));
@@ -563,7 +565,6 @@ void ShowArray(float* mas)
 	cout << "Discr: " << mas[DISCR] << endl;
 
 }
-
 void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
@@ -578,7 +579,6 @@ void CalcStats(int* stats)
 	cout << "Quadratic Equation: " << stats[QUAD] << endl;
 	cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 }
-
 void GeneralStats(int* stats)
 {
 	cout << "\n=GeneralStats\n";

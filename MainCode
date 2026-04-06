@@ -1,8 +1,11 @@
 /*
-	Calculator v1.7.2
+	Calculator v1.7.4
 	1) Полностью реализовал квадратные уравнения
 	2) поправил ошибку при отрицательном корне
 	3) переход от буквенных к строковым коммандам
+	4) добавил новые значения командам
+	5) сделал очистку при каждой новой команде
+	6) Теорема Пифагора
 */
 
 #include <iostream>
@@ -19,13 +22,13 @@ using namespace std;
 // ==================================
 // КОНСТАНТЫ
 // ==================================
-const string VERSION = "1.7.2";
+const string VERSION = "1.7.4";
 const string PASSWORD = "admin123";
 
 //===================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 //===================================
-int stats[7]; // 0 - add, 1 - min, 2 - mult, 3 - div, 4 - err, 5 - pow, 6 - quad
+int stats[9]; // 0 - add, 1 - min, 2 - mult, 3 - div, 4 - err, 5 - pow, 6 - sqrt, 7 - quad, 8 - PyTh
 time_t session_start;
 vector<string> history;
 
@@ -36,7 +39,7 @@ enum MassiveNumbers
 };
 enum StatNumbers
 {
-	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD
+	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH
 };
 
 //===================================
@@ -52,6 +55,7 @@ void Power(float* mas);
 void SquareRoot(float* mas);
 float Discr(float* mas);
 void Quad(float* mas);
+void PythagoreanTheorem(float* mas);
 // Debug-режим
 bool EnterDebugMode();
 bool QuitDebugMode();
@@ -83,9 +87,9 @@ int main()
 	float massive[6] = { 0, 0, 0, 0, 0, 0 };
 
 	// привет^^
-	cout << "++======================================++\n";
-	cout << "||   CalculatorCpp версии " << setw(10) << VERSION << "    ||\n";
-	cout << "++======================================++\n";
+	std::cout << "++======================================++\n";
+	std::cout << "||   CalculatorCpp версии " << setw(10) << VERSION << "    ||\n";
+	std::cout << "++======================================++\n";
 
 	// основной цикл
 	while (is_works)
@@ -94,13 +98,13 @@ int main()
 		cin >> command;
 
 		// основные операции
-		if (command == "+")
+		if (command == "+" || command == "sum" || command == "1")
 			Summa(massive);
-		else if (command == "-")
+		else if (command == "-" || command == "sub" || command == "2")
 			Minus(massive);
-		else if (command == "*")
+		else if (command == "*" || command == "mult" || command == "3")
 			Multiply(massive);
-		else if (command == "/")
+		else if (command == "/" || command == "div" || command == "4")
 			Divide(massive);
 
 		// утилиты, дебаг, выход
@@ -111,24 +115,26 @@ int main()
 				DebugMode(massive, stats);
 			}
 		}
-		else if (command == "esc")
+		else if (command == "esc" || command == "0" || command == "e")
 			is_works = Escape();
-		else if (command == "clr")
+		else if (command == "clr" || command == "c" || command == "." || command == ",")
 			ClearCMD();
 
 		// продвинутые
-		else if (command == "pow")
+		else if (command == "pow" || command == "5" || command == "p")
 			Power(massive);
-		else if (command == "sqrt")
+		else if (command == "sqrt" || command == "6" || command == "sr")
 			SquareRoot(massive);
-		else if (command == "quad")
+		else if (command == "quad" || command == "7" || command == "q")
 			Quad(massive);
+		else if (command == "pyth" || command == "8" || command == "pt")
+			PythagoreanTheorem(massive);
 
 		// исключения
 		else
 		{
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n"; 
-			stats[4]++;
+			stats[ERR]++;
 		}
 	}
 
@@ -142,21 +148,23 @@ int main()
 void SayHello()
 {
 	cout << "\nДоступные комманды:\n";
-	cout << "Сложение:                [+]\n";
-	cout << "Вычитание:               [-]\n";
-	cout << "Умножение:               [*]\n";
-	cout << "Деление:                 [/]\n";
-	cout << "Возведение в степень: [sqrt]\n";
-	cout << "Квадратный корень:     [pow]\n";
-	cout << "Квадратное уравнение: [quad]\n";
-	cout << "Очистить экран:        [clr]\n";
-	cout << "Выход:                 [esc]\n";
-	cout << "----------------------------\n";
+	cout << "Сложение:                  [sum]\n";
+	cout << "Вычитание:                 [sub]\n";
+	cout << "Умножение:                [mult]\n";
+	cout << "Деление:                   [div]\n";
+	cout << "Возведение в степень:     [sqrt]\n";
+	cout << "Квадратный корень:         [pow]\n";
+	cout << "Квадратное уравнение:     [quad]\n";
+	cout << "Теорема Пифагора:         [pyth]\n";
+	cout << "Очистить экран:            [clr]\n";
+	cout << "Выход:                     [esc]\n";
+	cout << "--------------------------------\n";
 	cout << "Введите команду: ";
 }
 
 void Summa(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Сложение: a + b\n";
 
@@ -176,6 +184,7 @@ void Summa(float* mas)
 
 void Minus(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Вычитание: a - b\n";
 
@@ -195,6 +204,7 @@ void Minus(float* mas)
 
 void Multiply(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Умножение: a * b\n";
 
@@ -214,6 +224,7 @@ void Multiply(float* mas)
 
 void Divide(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Деление: a / b\n";
 
@@ -241,6 +252,7 @@ void Divide(float* mas)
 
 void Power(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Возведение в степень: a^^b\n";
 
@@ -261,6 +273,7 @@ void Power(float* mas)
 
 void SquareRoot(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Квадратный корень: √a\n";
 
@@ -292,6 +305,7 @@ float Discr(float* masiv)
 
 void Quad(float* mas)
 {
+	ClearCMD();
 	sep();
 	cout << "Квадратное уравнение: ax^^2 + bx + c = 0\n";
 
@@ -342,13 +356,73 @@ void Quad(float* mas)
 		sep();
 	}
 }
+void PythagoreanTheorem(float* mas)
+{
+	ClearCMD();
+	sep();
+	char num;
+
+	cout << "Теорема Пифагора: AB^^2 + BC^^2 = AC^^2\n";
+	cout << "Катет - 1\n";
+	cout << "Гипотенуза - 2\n";
+	cout << "Выберете, что хотите найти: ";
+	cin >> num;
+
+	if (num == '1')
+	{
+		ClearCMD();
+		sep();
+		cout << "Теорема Пифагора: BC^^2 = AC^^2 - AB^^2\n";
+		cout << "Выберете, что хотите найти: " << num << endl;
+
+		cout << "Введите длину катета: ";
+		cin >> mas[A];
+
+		cout << "Введите длину гипотенузы: ";
+		cin >> mas[C];
+
+		mas[ANS] = (pow(mas[C], 2) - pow(mas[A], 2));
+
+		cout << "BC^^2 = " << pow(mas[C], 2) << " - " << pow(mas[A], 2) << " = " << mas[ANS] << endl;
+		cout << "BC = √" << mas[ANS] << " или же " << sqrt(mas[ANS]);
+
+		stats[PYTH]++;
+		AddHistory("BC = √" + FormatFloat(mas[ANS]) + " или же " + FormatFloat(sqrt(mas[ANS])));
+	}
+	else if (num == '2')
+	{
+		ClearCMD();
+		sep();
+		cout << "Теорема Пифагора: AB^^2 + BC^^2 = AC^^2\n";
+		cout << "Выберете, что хотите найти: " << num << endl;
+
+		cout << "Введите длину катета: ";
+		cin >> mas[A];
+
+		cout << "Введите длину второго катета: ";
+		cin >> mas[B];
+
+		mas[ANS] = pow(mas[A], 2) + pow(mas[B], 2);
+
+		cout << "AC^^2 = " << pow(mas[A], 2) << " - " << pow(mas[B], 2) << " = " << mas[ANS] << endl;
+		cout << "AC = √" << mas[ANS] << " или же " << sqrt(mas[ANS]);
+
+		AddHistory("AC = √" + FormatFloat(mas[ANS]) + " или же " + FormatFloat(sqrt(mas[ANS])));
+		stats[PYTH]++;
+	}
+	else
+	{
+		cout << "\033[91mОшибка: неправильный ввод!\033[0m\n";
+		stats[ERR]++;
+	}
+}
 
 // ============================================================================
 // УТИЛИТЫ
 // ============================================================================
 void sep()
 {
-	cout << "\n-------------------\n\n";
+	cout << "\n------------------------------------------\n\n";
 }
 
 float GetFloat()
@@ -494,7 +568,7 @@ void CalcStats(int* stats)
 {
 	cout << "\n=CalcStats\n";
 
-	cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] << endl;
+	cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] << endl;
 	cout << "Addition: " << stats[ADD] << endl;
 	cout << "Substraction: " << stats[MIN] << endl;
 	cout << "Multiplication: " << stats[MULT] << endl;
@@ -502,6 +576,7 @@ void CalcStats(int* stats)
 	cout << "Power: " << stats[POW] << endl;
 	cout << "Square Root: " << stats[SQRT] << endl;
 	cout << "Quadratic Equation: " << stats[QUAD] << endl;
+	cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 }
 
 void GeneralStats(int* stats)
@@ -514,7 +589,7 @@ void GeneralStats(int* stats)
 	int min = (int)dur / 60;  
 	int sec = (int)dur % 60;
 
-	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD];
+	int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH];
 
 	cout << "Programming language: C++\n";
 	cout << "Name: CALCULATORcpp\n";

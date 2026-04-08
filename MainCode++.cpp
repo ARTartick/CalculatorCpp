@@ -69,7 +69,6 @@ void SayHello()
 	cout << "Квадратный корень:        [sqrt]\n";
 	cout << "Квадратное уравнение:     [quad]\n";
 	cout << "Теорема Пифагора:         [pyth]\n";
-	cout << "Очистить экран:            [clr]\n";
 	cout << "Выход:                     [esc]\n";
 	cout << "--------------------------------\n";
 	cout << "Введите команду: ";
@@ -489,7 +488,7 @@ public:
 		// прочие функции
 		else if (cmd == "sum" || cmd == "1")
 			Summa();
-		else if (cmd == "min" || cmd == "2")
+		else if (cmd == "sub" || cmd == "2")
 			Minus();
 		else if (cmd == "mult" || cmd == "3")
 			Multiply();

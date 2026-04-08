@@ -287,6 +287,15 @@ private:
 		cout << "Введите b: ";
 		mas[B] = GetFloat();
 
+		if (mas[B] == 0)
+		{
+			cout << "\033[91mОшибка: деление на ноль невозможно!\033[0m\n";
+			AddHistory(FormatFloat(mas[A]) + "/0 = ERR");
+			stats[ERR]++;
+			sep();
+			return;
+		}
+
 		mas[ANS] = mas[A] / mas[B];
 		cout << "Ответ: " << mas[A] << " / " << mas[B] << " = " << mas[ANS] << endl;
 
@@ -299,7 +308,7 @@ private:
 		ClearCMD();
 		sep();
 
-		cout << "Деление: a^b\n";
+		cout << "Возведение в степень: a^b\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
@@ -308,7 +317,7 @@ private:
 		mas[ANS] = pow(mas[A], mas[B]);
 		cout << "Ответ: " << mas[A] << "^" << mas[B] << " = " << mas[ANS] << endl;
 
-		stats[DIV]++;
+		stats[POW]++;
 		AddHistory(FormatFloat(mas[A]) + "^" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
@@ -317,15 +326,23 @@ private:
 		ClearCMD();
 		sep();
 
-		cout << "Деление: √а\n";
+		cout << "Квадратный корень: √а\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 
-		mas[ANS] = sqrt(mas[A]);
-		cout << "Ответ: √" << mas[A] << " = " << mas[ANS] << endl;
+		if (mas[A] < 0) 
+		{
+    		mas[ANS] = sqrt(abs(mas[A]));
+    		cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
+		}
+		else
+		{
+			mas[ANS] = sqrt(mas[A]);
+			cout << "Ответ: √" << mas[A] << " = " << mas[ANS] << endl;
 
-		stats[DIV]++;
-		AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+			stats[SQRT]++;
+			AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		}
 		sep();
 	}
 	void Quad()

@@ -15,11 +15,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.0.5"; // версия
-
-
-//переменные
-time_t session_start;
+const string version = "2.0.6"; // версия
 
 // Перечисления
 enum MassiveNumbers
@@ -75,6 +71,7 @@ class Operator
 private:
 	// переменные
 	string cmd;
+	time_t session_start;
 	char debugCMD;
 	bool inDebug;
 	bool is_works;
@@ -82,7 +79,7 @@ private:
 	// массивы
 	int stats[9];
 	float mas[6];
-	vector<string> History;
+	vector<string> history;
 
 	// утилиты
 	float GetFloat()
@@ -115,10 +112,10 @@ private:
 	}
 	void AddHistory(string op)
 	{
-		History.push_back(op);
-		if (History.size() > 10)
+		history.push_back(op);
+		if (history.size() > 10)
 		{
-			History.erase(History.begin());
+			history.erase(history.begin());
 		}
 	}
 	void DebugMode()
@@ -218,12 +215,12 @@ private:
 	{
 		cout << "\n=ShowHistory\n";
 
-		if (History.empty())
+		if (history.empty())
 		{
 			cout << "\033[91mИстория операций пока что пуста...\033[0m" << endl;
 		}
 		int num = 1;
-		for (auto it = History.rbegin(); it != History.rend(); ++it, ++num)
+		for (auto it = history.rbegin(); it != history.rend(); ++it, ++num)
 		{
 			cout << "[" << num << "] " << *it << endl;
 		}
@@ -503,7 +500,7 @@ public:
 
 
 	// is_works
-	bool isRunning()
+	bool isRunning() const
 	{
 		return is_works;
 	}

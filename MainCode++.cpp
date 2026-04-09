@@ -15,7 +15,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.0.4"; // версия
+const string version = "2.0.5"; // версия
 
 
 //переменные
@@ -77,6 +77,7 @@ private:
 	string cmd;
 	char debugCMD;
 	bool inDebug;
+	bool is_works;
 
 	// массивы
 	int stats[9];
@@ -150,6 +151,21 @@ private:
 			case '4': ShowHistory(); break;
 			default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stats[ERR]++;
 			}
+		}
+	}
+	void SetData()
+	{
+		is_works = true;
+		session_start = time(nullptr);
+		debugCMD = ' ';
+		inDebug = true;
+		for (int i = 0; i < 6; i++)
+		{
+			mas[i] = 0;
+		}
+		for (int i = 0; i < 9; i++)
+		{
+			stats[i] = 0;
 		}
 	}
 
@@ -482,11 +498,15 @@ public:
 	// конструктор
 	Operator()
 	{
-		is_works = true;
-		session_start = time(nullptr);
+		SetData();
 	}
 
-	bool is_works;
+
+	// is_works
+	bool isRunning()
+	{
+		return is_works;
+	}
 	// основная функция
 	void Operations()
 	{
@@ -547,7 +567,7 @@ int main()
 	ClearCMD();
 
 	//основной цикл
-	while (op.is_works)
+	while (op.isRunning())
 	{
 		op.Operations();
 	}

@@ -15,7 +15,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.0.0"; // версия
+const string version = "2.0.3"; // версия
 
 
 //переменные

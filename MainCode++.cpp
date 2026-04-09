@@ -15,13 +15,11 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.0.3"; // версия
+const string version = "2.0.4"; // версия
 
 
 //переменные
 time_t session_start;
-vector<string> History;
-bool is_works;
 
 // Перечисления
 enum MassiveNumbers
@@ -83,6 +81,7 @@ private:
 	// массивы
 	int stats[9];
 	float mas[6];
+	vector<string> History;
 
 	// утилиты
 	float GetFloat()
@@ -335,6 +334,7 @@ private:
 			mas[ANS] = sqrt(abs(mas[A]));
 			cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
 			stats[SQRT]++;
+			AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]) + "i");
 		}
 		else
 		{
@@ -354,49 +354,60 @@ private:
 		cout << "Стандартный вид: ax^2 + bx + c = 0\n";
 		cout << "Введите a: ";
 		mas[A] = GetFloat();
-		cout << "Введите b: ";
-		mas[B] = GetFloat();
-		cout << "Введите c: ";
-		mas[C] = GetFloat();
 
-		mas[DISCR] = pow(mas[B], 2) - (4 * mas[A] * mas[C]);
-		cout << "Дискриминант равен " << mas[DISCR] << endl;
-		AddHistory(FormatFloat(mas[B]) + "^2 - 4 * " + FormatFloat(mas[A]) + " * " + FormatFloat(mas[C]) + " = " + FormatFloat(pow(mas[B], 2) - (4 * mas[A] * mas[C])));
-
-		if (mas[DISCR] == 0)
+		while (mas[A] == 0)
 		{
-			cout << "Следовательно 1 действительный корень" << endl;
-			mas[ANS] = (-1 * mas[B]) / (2 * mas[A]);
-			cout << "(-1 * " << mas[B] << ") / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
-			cout << "x1 = " << mas[ANS] << endl;
-			AddHistory("(-1 * " + FormatFloat(mas[B]) + ") / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
-			stats[QUAD]++;
-			sep();
+			cout << "\033[91mОшибка: коэффициент а не может быть равен нулю\033[0m\n";
+			stats[ERR]++;
+			cout << "Введите а снова: ";
+			mas[A] = GetFloat();
 		}
-		else if (mas[DISCR] > 0)
+		if (mas[A] != 0)
 		{
-			cout << "Следовательно уравнение имеет 2 действительных корня\n";
+			cout << "Введите b: ";
+			mas[B] = GetFloat();
+			cout << "Введите c: ";
+			mas[C] = GetFloat();
 
-			mas[ANS] = ((-1 * mas[B]) + sqrt(mas[DISCR])) / (2 * mas[A]);
-			cout << "(-1 * " << mas[B] << ") + √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
-			mas[X2] = ((-1 * mas[B]) - sqrt(mas[DISCR])) / (2 * mas[A]);
-			cout << "(-1 * " << mas[B] << ") - √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[X2] << endl;
+			mas[DISCR] = pow(mas[B], 2) - (4 * mas[A] * mas[C]);
+			cout << "Дискриминант равен " << mas[DISCR] << endl;
+			AddHistory(FormatFloat(mas[B]) + "^2 - 4 * " + FormatFloat(mas[A]) + " * " + FormatFloat(mas[C]) + " = " + FormatFloat(pow(mas[B], 2) - (4 * mas[A] * mas[C])));
 
-			cout << "x1 = " << mas[ANS] << endl;
-			cout << "x2 = " << mas[X2] << endl;
+			if (mas[DISCR] == 0)
+			{
+				cout << "Следовательно 1 действительный корень" << endl;
+				mas[ANS] = (-1 * mas[B]) / (2 * mas[A]);
+				cout << "(-1 * " << mas[B] << ") / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+				cout << "x1 = " << mas[ANS] << endl;
+				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
+				stats[QUAD]++;
+				sep();
+			}
+			else if (mas[DISCR] > 0)
+			{
+				cout << "Следовательно уравнение имеет 2 действительных корня\n";
 
-			AddHistory("(-1 * " + FormatFloat(mas[B]) + ") + √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
-			AddHistory("(-1 * " + FormatFloat(mas[B]) + ") - √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[X2]));
-			stats[QUAD]++;
-			sep();
-		}
-		else
-		{
-			cout << "Следовательно уравнение не имеет действительных корней\n";
+				mas[ANS] = ((-1 * mas[B]) + sqrt(mas[DISCR])) / (2 * mas[A]);
+				cout << "(-1 * " << mas[B] << ") + √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[ANS] << endl;
+				mas[X2] = ((-1 * mas[B]) - sqrt(mas[DISCR])) / (2 * mas[A]);
+				cout << "(-1 * " << mas[B] << ") - √" << mas[DISCR] << " / (2 * " << mas[A] << ") = " << mas[X2] << endl;
 
-			AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^^ + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
-			stats[QUAD]++;
-			sep();
+				cout << "x1 = " << mas[ANS] << endl;
+				cout << "x2 = " << mas[X2] << endl;
+
+				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") + √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
+				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") - √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[X2]));
+				stats[QUAD]++;
+				sep();
+			}
+			else
+			{
+				cout << "Следовательно уравнение не имеет действительных корней\n";
+
+				AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^^ + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
+				stats[QUAD]++;
+				sep();
+			}
 		}
 	}
 	void PyTh()
@@ -474,6 +485,8 @@ public:
 		is_works = true;
 		session_start = time(nullptr);
 	}
+
+	bool is_works;
 	// основная функция
 	void Operations()
 	{
@@ -534,7 +547,7 @@ int main()
 	ClearCMD();
 
 	//основной цикл
-	while (is_works)
+	while (op.is_works)
 	{
 		op.Operations();
 	}

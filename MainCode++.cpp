@@ -17,14 +17,11 @@ using namespace std;
 
 const string version = "2.0.0"; // версия
 
-// массивы
-int stats[9];
-float mas[6];
 
 //переменные
 time_t session_start;
 vector<string> History;
-bool is_works = true;
+bool is_works;
 
 // Перечисления
 enum MassiveNumbers
@@ -82,6 +79,10 @@ private:
 	string cmd;
 	char debugCMD;
 	bool inDebug;
+
+	// массивы
+	int stats[9];
+	float mas[6];
 
 	// утилиты
 	float GetFloat()
@@ -163,7 +164,7 @@ private:
 		cout << "c: " << mas[C] << endl;
 		cout << "Last Answer: " << mas[ANS] << endl;
 		cout << "Last second Answer: " << mas[X2] << endl;
-		cout << "Discr: " << mas[DISCR] << endl; 
+		cout << "Discr: " << mas[DISCR] << endl;
 	}
 	void CalcStats()
 	{
@@ -233,7 +234,7 @@ private:
 		mas[B] = GetFloat();
 
 		mas[ANS] = mas[A] + mas[B];
-		cout << "Ответ: "<< mas[A] << " + " << mas[B] << " = " << mas[ANS] << endl;
+		cout << "Ответ: " << mas[A] << " + " << mas[B] << " = " << mas[ANS] << endl;
 
 		stats[ADD]++;
 		AddHistory(FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
@@ -329,10 +330,11 @@ private:
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 
-		if (mas[A] < 0) 
+		if (mas[A] < 0)
 		{
-    		mas[ANS] = sqrt(abs(mas[A]));
-    		cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
+			mas[ANS] = sqrt(abs(mas[A]));
+			cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
+			stats[SQRT]++;
 		}
 		else
 		{
@@ -466,6 +468,12 @@ private:
 	}
 
 public:
+	// конструктор
+	Operator()
+	{
+		is_works = true;
+		session_start = time(nullptr);
+	}
 	// основная функция
 	void Operations()
 	{
@@ -473,7 +481,7 @@ public:
 		cin >> cmd;
 
 		// выход
-		if (cmd == "esc")
+		if (cmd == "esc" || cmd == "0")
 		{
 			sep();
 			cout << "Выход из программы...\n";
@@ -505,6 +513,7 @@ public:
 		// исключение
 		else
 		{
+			ClearCMD();
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
 			stats[ERR]++;
 		}
@@ -518,8 +527,7 @@ INT MAIN() {...}
 */
 int main()
 {
-	setlocale(LC_ALL, "RU"); // русский яязык
-	session_start = time(nullptr); // старт сессии
+	setlocale(LC_ALL, "RU"); // русский язык
 
 	Operator op; // создание объекта
 

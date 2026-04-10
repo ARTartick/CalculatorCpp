@@ -7,6 +7,8 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+#include <fstream>
+
 using namespace std;
 
 /*
@@ -15,7 +17,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.0.6"; // версия
+const string version = "2.1.0"; // версия
 
 // Перечисления
 enum MassiveNumbers
@@ -66,6 +68,7 @@ void SayHello()
 }
 
 // класс
+
 class Operator
 {
 private:
@@ -79,6 +82,7 @@ private:
 	// массивы
 	int stats[9];
 	float mas[6];
+	// векторы и т.д.
 	vector<string> history;
 
 	// утилиты
@@ -109,14 +113,6 @@ private:
 		stringstream ss;
 		ss << fixed << setprecision(2) << val;
 		return ss.str();
-	}
-	void AddHistory(string op)
-	{
-		history.push_back(op);
-		if (history.size() > 10)
-		{
-			history.erase(history.begin());
-		}
 	}
 	void DebugMode()
 	{
@@ -491,11 +487,45 @@ private:
 		}
 	}
 
+	// история
+	void AddHistory(string op)
+	{
+		history.push_back(op);
+		if (history.size() > 10)
+		{
+			history.erase(history.begin());
+		}
+	}
+	void SaveHistory()
+	{
+		ofstream outFile("history.txt");
+		if (!outFile.is_open())
+		{
+			cerr << "\n\033[91mОшибка: не удалось открыть файл для записи\033[0m\n";
+			return;
+		}
+
+		outFile << history.size() << "\n";
+
+		for (const string& record : history)
+		{
+			outFile << record << "\n";
+		}
+		outFile.close();
+		cout << "\n\033[93mИстория сохранена!\033[0m\n";
+	}
+	
+
 public:
 	// конструктор
 	Operator()
 	{
 		SetData();
+	}
+	// деструктор
+	~Operator()
+	{
+		cout << "Спасибо за использование CalculatorCpp\n";
 	}
 
 
@@ -507,6 +537,8 @@ public:
 	// основная функция
 	void Operations()
 	{
+		SaveHistory();
+
 		SayHello();
 		cin >> cmd;
 
@@ -548,6 +580,31 @@ public:
 			stats[ERR]++;
 		}
 	}
+	void LoadHistory()
+	{
+		ifstream inFile("history.txt");
+		if (!inFile.is_open())
+		{
+			return;
+		}
+
+		size_t count;
+		inFile >> count; 
+		inFile.ignore();
+
+		history.clear();
+		history.reserve(count);
+
+		string line;
+		for (size_t i = 0; i < count; ++i)
+		{
+			if (getline(inFile, line))
+			{
+				history.push_back(line);
+			}
+		}
+		inFile.close();
+	}
 };
 
 /*
@@ -560,6 +617,7 @@ int main()
 	setlocale(LC_ALL, "RU"); // русский язык
 
 	Operator op; // создание объекта
+	op.LoadHistory();
 
 	ClearCMD();
 
@@ -569,6 +627,5 @@ int main()
 		op.Operations();
 	}
 
-	cout << "\nСпасибо за использование CalculatorCpp\n";
 	return 0;
 }

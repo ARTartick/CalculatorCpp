@@ -17,7 +17,8 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.1.0"; // версия
+const string version = "2.1.1"; // версия
+const int STATS_COUNT = 9;
 
 // Перечисления
 enum MassiveNumbers
@@ -67,7 +68,13 @@ void SayHello()
 	cout << "Введите команду: ";
 }
 
-// класс
+// классы
+
+class SaveLoad
+{
+public:
+	
+};
 
 class Operator
 {
@@ -80,7 +87,7 @@ private:
 	bool is_works;
 
 	// массивы
-	int stats[9];
+	int stats[STATS_COUNT];
 	float mas[6];
 	// векторы и т.д.
 	vector<string> history;
@@ -496,48 +503,113 @@ private:
 			history.erase(history.begin());
 		}
 	}
-	void SaveHistory()
+	void Save(string file_name, vector<string>& mas, string err_name, string last_name)
 	{
-		ofstream outFile("history.txt");
+		ofstream outFile(file_name);
 		if (!outFile.is_open())
 		{
-			cerr << "\n\033[91mОшибка: не удалось открыть файл для записи\033[0m\n";
+			cerr << "\n\033[91mОшибка: " << err_name << "\033[0m\n";
 			return;
 		}
 
-		outFile << history.size() << "\n";
+		outFile << mas.size() << "\n";
 
-		for (const string& record : history)
+		for (const string& record : mas)
 		{
 			outFile << record << "\n";
 		}
 		outFile.close();
-		cout << "\n\033[93mИстория сохранена!\033[0m\n";
+		cout << "\n\033[93m" << last_name << " сохранена!\033[0m\n";
 	}
-	
+	void Save(string file_name, string err_name, string last_name)
+	{
+		ofstream outFile(file_name);
+		if (!outFile.is_open())
+		{
+			cerr << "\n\033[91mОшибка: " << err_name << "\033[0m\n";
+			return;
+		}
+
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			outFile << stats[i] << "\n";
+		}
+		outFile.close();
+		cout << "\033[93m" << last_name << " сохранена!\033[0m\n";
+	}
+	void Load(string file_name, vector<string>& mas)
+	{
+		ifstream inFile(file_name);
+		if (!inFile.is_open())
+		{
+			return;
+		}
+
+		size_t count;
+		inFile >> count;
+		inFile.ignore();
+
+		mas.clear();
+		mas.reserve(count);
+
+		string line;
+		for (size_t i = 0; i < count; ++i)
+		{
+			if (getline(inFile, line))
+			{
+				mas.push_back(line);
+			}
+		}
+		inFile.close();
+	}
+	void Load(string file_name)
+	{
+		ifstream inFile(file_name);
+		if (!inFile.is_open())
+		{
+			return;
+		}
+
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			if (!(inFile >> stats[i]))
+			{
+				stats[i] = 0;
+			}
+		}
+		inFile.close();
+	}
 
 public:
 	// конструктор
 	Operator()
 	{
 		SetData();
+
+		Load("history.txt", history);
+		Load("stats.txt");
+
+		ClearCMD();
 	}
 	// деструктор
 	~Operator()
 	{
 		cout << "Спасибо за использование CalculatorCpp\n";
+		Save("history.txt", history, "не удалось открыть файл для записи истории", "История");
+		Save("stats.txt", "не удалось открыть файл для записи статистики", "Статистика");
 	}
-
 
 	// is_works
 	bool isRunning() const
 	{
 		return is_works;
 	}
+
 	// основная функция
 	void Operations()
 	{
-		SaveHistory();
+		Save("history.txt", history, "не удалось открыть файл для записи истории", "История");
+		Save("stats.txt", "не удалось открыть файл для записи статистики", "Статистика");
 
 		SayHello();
 		cin >> cmd;
@@ -580,31 +652,6 @@ public:
 			stats[ERR]++;
 		}
 	}
-	void LoadHistory()
-	{
-		ifstream inFile("history.txt");
-		if (!inFile.is_open())
-		{
-			return;
-		}
-
-		size_t count;
-		inFile >> count; 
-		inFile.ignore();
-
-		history.clear();
-		history.reserve(count);
-
-		string line;
-		for (size_t i = 0; i < count; ++i)
-		{
-			if (getline(inFile, line))
-			{
-				history.push_back(line);
-			}
-		}
-		inFile.close();
-	}
 };
 
 /*
@@ -617,9 +664,6 @@ int main()
 	setlocale(LC_ALL, "RU"); // русский язык
 
 	Operator op; // создание объекта
-	op.LoadHistory();
-
-	ClearCMD();
 
 	//основной цикл
 	while (op.isRunning())

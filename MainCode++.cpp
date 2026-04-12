@@ -589,7 +589,7 @@ public:
 		SetData();
 
 		Load("history");
-		Load("stats.txt");
+		Load("stats");
 
 		ClearCMD();
 	}

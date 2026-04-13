@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cmath>
 #include <fstream>
+#include <conio.h>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.1.4"; // версия
+const string version = "2.2.0"; // версия
 const int STATS_COUNT = 9;
 
 // Перечисления
@@ -25,7 +26,6 @@ enum MassiveNumbers
 {
 	A, B, C, ANS, X2, DISCR
 };
-
 enum StatNumbers
 {
 	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH
@@ -74,11 +74,10 @@ void SayHello()
 class Operator
 {
 private:
-
 	// переменные
 	string cmd;
 	time_t session_start;
-	char debugCMD;
+	char getchCMD;
 	bool inDebug;
 	bool is_works;
 
@@ -136,10 +135,10 @@ private:
 			cout << "[5] Очистить историю и статистику\n";
 			cout << "[0] Выход из debug mode\n";
 			cout << "Введите команду: ";
-			cin >> debugCMD;
+			getchCMD = _getch();
 			ClearCMD();
 
-			switch (debugCMD)
+			switch (getchCMD)
 			{
 			case '0': QuitDebugMode(); break;
 			case '1': ShowArray(); break;
@@ -155,7 +154,7 @@ private:
 	{
 		is_works = true;
 		session_start = time(nullptr);
-		debugCMD = ' ';
+		getchCMD = ' ';
 		inDebug = true;
 		for (int i = 0; i < 6; i++)
 		{
@@ -330,6 +329,7 @@ private:
 		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
+
 	void Power()
 	{
 		ClearCMD();
@@ -374,6 +374,7 @@ private:
 		}
 		sep();
 	}
+
 	void Quad()
 	{
 		ClearCMD();
@@ -448,7 +449,7 @@ private:
 		cout << "Катет - 1\n";
 		cout << "Гипотенуза - 2\n";
 		cout << "Выберете, что хотите найти: ";
-		cin >> num;
+		num = _getch();
 
 		if (num == '1')
 		{
@@ -612,6 +613,7 @@ public:
 
 		ClearCMD();
 	}
+
 	// деструктор
 	~Operator()
 	{
@@ -627,7 +629,6 @@ public:
 	}
 
 	// is_works
-
 	bool isRunning() const
 	{
 		return is_works;
@@ -657,13 +658,13 @@ public:
 		else if (cmd == "mult" || cmd == "3")
 			Multiply();
 		else if (cmd == "div" || cmd == "4")
-			
 			Divide();
+			
 		else if (cmd == "pow" || cmd == "5")
 			Power();
 		else if (cmd == "sqrt" || cmd == "6")
-			
 			Sqrt();
+			
 		else if (cmd == "quad" || cmd == "7")
 			Quad();
 		else if (cmd == "pyth" || cmd == "8")
@@ -683,7 +684,6 @@ public:
 INT MAIN() {...}
 ====================================
 */
-
 int main()
 {
 	setlocale(LC_ALL, "RU"); // русский язык

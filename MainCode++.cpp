@@ -17,7 +17,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.1.2"; // версия
+const string version = "2.1.4"; // версия
 const int STATS_COUNT = 9;
 
 // Перечисления
@@ -25,6 +25,7 @@ enum MassiveNumbers
 {
 	A, B, C, ANS, X2, DISCR
 };
+
 enum StatNumbers
 {
 	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH
@@ -73,6 +74,7 @@ void SayHello()
 class Operator
 {
 private:
+
 	// переменные
 	string cmd;
 	time_t session_start;
@@ -119,18 +121,19 @@ private:
 	{
 		ClearCMD();
 		sep();
-		cout << "YOU ENTERED DEBUG-MODE\n";
+		cout << "\033[92mYOU ENTERED DEBUG-MODE\033[0m\n";
 		inDebug = true;
 
 		while (inDebug)
 		{
 			sep();
 
-			cout << "DEBUG MODE MENU";
+			cout << "\033[96mDEBUG MODE MENU\033[0m";
 			cout << "\n[1] Просмотр массива\n";
 			cout << "[2] Статистика вычислений\n";
 			cout << "[3] Общая статистика\n";
 			cout << "[4] История вычислений\n";
+			cout << "[5] Очистить историю и статистику\n";
 			cout << "[0] Выход из debug mode\n";
 			cout << "Введите команду: ";
 			cin >> debugCMD;
@@ -143,6 +146,7 @@ private:
 			case '2': CalcStats(); break;
 			case '3': GeneralStats(); break;
 			case '4': ShowHistory(); break;
+			case '5': ClearStats(); break;
 			default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stats[ERR]++;
 			}
 		}
@@ -166,7 +170,7 @@ private:
 	// команды дебага
 	void ShowArray()
 	{
-		cout << "\n=ShowArray\n";
+		cout << "\n\033[93m=ShowArray\033[0m\n";
 
 		cout << "a: " << mas[A] << endl;
 		cout << "b: " << mas[B] << endl;
@@ -177,7 +181,7 @@ private:
 	}
 	void CalcStats()
 	{
-		cout << "\n=CalcStats\n";
+		cout << "\n\033[93m=CalcStats\033[0m\n";
 
 		cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] << endl;
 		cout << "Addition: " << stats[ADD] << endl;
@@ -191,7 +195,7 @@ private:
 	}
 	void GeneralStats()
 	{
-		cout << "\n=GeneralStats\n";
+		cout << "\n\033[93m=GeneralStats\033[0m\n";
 
 		time_t now = time(nullptr);
 		double dur = difftime(now, session_start);
@@ -210,7 +214,7 @@ private:
 	}
 	void ShowHistory()
 	{
-		cout << "\n=ShowHistory\n";
+		cout << "\n\033[93m=ShowHistory\033[0m\n";
 
 		if (history.empty())
 		{
@@ -222,10 +226,24 @@ private:
 			cout << "[" << num << "] " << *it << endl;
 		}
 	}
+	void ClearStats()
+	{
+		cout << "\n\033[93m=ClearStats\033[0m\n";
+
+		history.clear();
+		cout << "История успешно очищена\n";
+
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			stats[i] = 0;
+		}
+		cout << "Статистика успешно очищена\n";
+
+	}
 	void QuitDebugMode()
 	{
 		cout << "\n=======================\n";
-		cout << "ВЫ ВЫШЛИ ИЗ DEBUG MODE";
+		cout << "\033[93mВЫ ВЫШЛИ ИЗ DEBUG MODE\033[0m";
 		cout << "\n=======================\n\n";
 		inDebug = false;
 	}
@@ -583,6 +601,7 @@ private:
 	}
 
 public:
+
 	// конструктор
 	Operator()
 	{
@@ -608,6 +627,7 @@ public:
 	}
 
 	// is_works
+
 	bool isRunning() const
 	{
 		return is_works;
@@ -637,10 +657,12 @@ public:
 		else if (cmd == "mult" || cmd == "3")
 			Multiply();
 		else if (cmd == "div" || cmd == "4")
+			
 			Divide();
 		else if (cmd == "pow" || cmd == "5")
 			Power();
 		else if (cmd == "sqrt" || cmd == "6")
+			
 			Sqrt();
 		else if (cmd == "quad" || cmd == "7")
 			Quad();
@@ -661,6 +683,7 @@ public:
 INT MAIN() {...}
 ====================================
 */
+
 int main()
 {
 	setlocale(LC_ALL, "RU"); // русский язык

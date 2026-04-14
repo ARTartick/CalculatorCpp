@@ -18,7 +18,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.2.1"; // версия
+const string version = "2.2.2"; // версия
 const int STATS_COUNT = 10;
 
 // Перечисления
@@ -160,9 +160,20 @@ private:
 		{
 			mas[i] = 0;
 		}
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < STATS_COUNT; i++)
 		{
 			stats[i] = 0;
+		}
+	}
+	void GetCMD()
+	{
+		if (stats[MODE] == 0) // standart
+		{
+			cin >> cmd;
+		}
+		else if (stats[MODE] == 1) // fast
+		{
+			getchCMD = _getch();
 		}
 	}
 
@@ -181,9 +192,11 @@ private:
 	void CalcStats()
 	{
 		cout << "\n\033[93m=CalcStats\033[0m\n";
-		int a;
+		int a = 0;
 		for (int i = 0; i < STATS_COUNT; i++)
 		{
+			if (i == 9)
+				continue;
 			a = a + stats[i];
 		}
 
@@ -213,6 +226,12 @@ private:
 		cout << "Name: CALCULATORcpp\n";
 		cout << "Version: " << version << endl;
 		cout << "Session duration: " << minutes << "min " << secondes << "sec" << endl;
+		cout << "Enter mode: ";
+		switch (stats[MODE])
+		{
+		case 0: cout << "standart\n";
+		case 1: cout << "fast\n";
+		}
 		cout << "Total operations: " << total << endl;
 		cout << "Total errors: " << stats[ERR] << endl;
 	}
@@ -605,6 +624,7 @@ private:
 	}
 
 public:
+
 	// конструктор
 	Operator()
 	{
@@ -615,6 +635,7 @@ public:
 
 		ClearCMD();
 	}
+
 	// деструктор
 	~Operator()
 	{
@@ -642,31 +663,49 @@ public:
 		Save("stats", "NO");
 
 		SayHello();
-		cin >> cmd;
+		GetCMD();
 
 		// выход
-		if (cmd == "esc" || cmd == "0")
+		if (cmd == "esc" || cmd == "0" || getchCMD == '0')
 			is_works = false;
 		// дебаг
-		else if (cmd == "d")
+		else if (cmd == "d" || cmd == "в" || getchCMD == 'd' || getchCMD == 'в')
 			DebugMode();
+		else if (cmd == "switch" || cmd == "s" || cmd == "ы" || getchCMD == 's' || getchCMD == 'ы')
+		{
+			cout << "s\n";
+			if (stats[MODE] == 0)
+			{
+				stats[MODE] = 1;
+				cmd = "?63288837###gsejvbefoser^^@72534hbdsfkl";
+				ClearCMD();
+				cout << "\033[93mРежим ввода сменён на быстрый\033[0m\n";
+			}
+			else if (stats[MODE] == 1)
+			{
+				stats[MODE] = 0;
+				cmd = "!63288837###gsejvbefoser^!@72534hbdsfkl";
+				ClearCMD();
+				cout << "\033[93mРежим ввода сменён на стандартный\033[0m\n";
+			}
+		}
 
 		// прочие функции
-		else if (cmd == "sum" || cmd == "1")
+		else if (cmd == "sum" || cmd == "1" || getchCMD == '1')
 			Summa();
-		else if (cmd == "sub" || cmd == "2")
+		else if (cmd == "sub" || cmd == "2" || getchCMD == '2')
 			Minus();
-		else if (cmd == "mult" || cmd == "3")
+		else if (cmd == "mult" || cmd == "3" || getchCMD == '3')
 			Multiply();
-		else if (cmd == "div" || cmd == "4")
+		else if (cmd == "div" || cmd == "4" || getchCMD == '4')
 			Divide();
-		else if (cmd == "pow" || cmd == "5")
+		else if (cmd == "pow" || cmd == "5" || getchCMD == '5')
 			Power();
-		else if (cmd == "sqrt" || cmd == "6")
+		else if (cmd == "sqrt" || cmd == "6" || getchCMD == '6')
 			Sqrt();
-		else if (cmd == "quad" || cmd == "7")
+		else if (cmd == "quad" || cmd == "7" || getchCMD == '7')
 			Quad();
-		else if (cmd == "pyth" || cmd == "8")
+		else if (cmd == "pyth" || cmd == "8" || getchCMD == '8')
 			PyTh();
 		// исключение
 		else
@@ -686,8 +725,9 @@ INT MAIN() {...}
 
 int main()
 {
-	setlocale(LC_ALL, "RU"); // русский язык
+	cout << "\033[92mLoading...\033[0m\n";
 
+	setlocale(LC_ALL, "RU"); // русский язык
 	Operator op; // создание объекта
 
 	//основной цикл

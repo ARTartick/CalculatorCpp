@@ -18,8 +18,8 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.2.0"; // версия
-const int STATS_COUNT = 9;
+const string version = "2.2.1"; // версия
+const int STATS_COUNT = 10;
 
 // Перечисления
 enum MassiveNumbers
@@ -28,7 +28,7 @@ enum MassiveNumbers
 };
 enum StatNumbers
 {
-	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH
+	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH, MODE
 };
 
 /*
@@ -181,8 +181,13 @@ private:
 	void CalcStats()
 	{
 		cout << "\n\033[93m=CalcStats\033[0m\n";
+		int a;
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			a = a + stats[i];
+		}
 
-		cout << "Total operations: " << stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] << endl;
+		cout << "Total operations: " << a << endl;
 		cout << "Addition: " << stats[ADD] << endl;
 		cout << "Substraction: " << stats[MIN] << endl;
 		cout << "Multiplication: " << stats[MULT] << endl;
@@ -197,17 +202,17 @@ private:
 		cout << "\n\033[93m=GeneralStats\033[0m\n";
 
 		time_t now = time(nullptr);
-		double dur = difftime(now, session_start);
+		double durat = difftime(now, session_start);
 
-		int min = (int)dur / 60;
-		int sec = (int)dur % 60;
+		int minutes = (int)durat / 60;
+		int secondes = (int)durat % 60;
 
 		int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH];
 
 		cout << "Programming language: C++\n";
 		cout << "Name: CALCULATORcpp\n";
 		cout << "Version: " << version << endl;
-		cout << "Session duration: " << min << "min " << sec << "sec" << endl;
+		cout << "Session duration: " << minutes << "min " << secondes << "sec" << endl;
 		cout << "Total operations: " << total << endl;
 		cout << "Total errors: " << stats[ERR] << endl;
 	}
@@ -329,7 +334,6 @@ private:
 		AddHistory(FormatFloat(mas[A]) + " / " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
-
 	void Power()
 	{
 		ClearCMD();
@@ -374,7 +378,6 @@ private:
 		}
 		sep();
 	}
-
 	void Quad()
 	{
 		ClearCMD();
@@ -602,7 +605,6 @@ private:
 	}
 
 public:
-
 	// конструктор
 	Operator()
 	{
@@ -613,7 +615,6 @@ public:
 
 		ClearCMD();
 	}
-
 	// деструктор
 	~Operator()
 	{
@@ -659,12 +660,10 @@ public:
 			Multiply();
 		else if (cmd == "div" || cmd == "4")
 			Divide();
-			
 		else if (cmd == "pow" || cmd == "5")
 			Power();
 		else if (cmd == "sqrt" || cmd == "6")
 			Sqrt();
-			
 		else if (cmd == "quad" || cmd == "7")
 			Quad();
 		else if (cmd == "pyth" || cmd == "8")
@@ -684,6 +683,7 @@ public:
 INT MAIN() {...}
 ====================================
 */
+
 int main()
 {
 	setlocale(LC_ALL, "RU"); // русский язык

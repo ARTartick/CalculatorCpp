@@ -18,7 +18,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.2.2"; // версия
+const string version = "2.2.4"; // версия
 const int STATS_COUNT = 10;
 
 // Перечисления

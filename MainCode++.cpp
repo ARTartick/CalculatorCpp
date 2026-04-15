@@ -64,6 +64,7 @@ void SayHello()
 	cout << "Квадратный корень:        [sqrt]\n";
 	cout << "Квадратное уравнение:     [quad]\n";
 	cout << "Теорема Пифагора:         [pyth]\n";
+	cout << "Сменить метод ввода:    [switch]\n";
 	cout << "Выход:                     [esc]\n";
 	cout << "--------------------------------\n";
 	cout << "Введите команду: ";
@@ -229,8 +230,8 @@ private:
 		cout << "Enter mode: ";
 		switch (stats[MODE])
 		{
-		case 0: cout << "standart\n";
-		case 1: cout << "fast\n";
+		case 0: cout << "standart\n"; break;
+		case 1: cout << "fast\n"; break;
 		}
 		cout << "Total operations: " << total << endl;
 		cout << "Total errors: " << stats[ERR] << endl;
@@ -673,18 +674,17 @@ public:
 			DebugMode();
 		else if (cmd == "switch" || cmd == "s" || cmd == "ы" || getchCMD == 's' || getchCMD == 'ы')
 		{
-			cout << "s\n";
 			if (stats[MODE] == 0)
 			{
 				stats[MODE] = 1;
-				cmd = "?63288837###gsejvbefoser^^@72534hbdsfkl";
+				cmd = " ";
 				ClearCMD();
 				cout << "\033[93mРежим ввода сменён на быстрый\033[0m\n";
 			}
 			else if (stats[MODE] == 1)
 			{
 				stats[MODE] = 0;
-				cmd = "!63288837###gsejvbefoser^!@72534hbdsfkl";
+				cmd = " ";
 				ClearCMD();
 				cout << "\033[93mРежим ввода сменён на стандартный\033[0m\n";
 			}

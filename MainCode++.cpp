@@ -18,7 +18,7 @@ using namespace std;
 ====================================
 */
 
-const string version = "2.3.1"; // версия
+const string version = "2.3.2"; // версия
 const int STATS_COUNT = 10;
 
 // Перечисления
@@ -28,7 +28,7 @@ enum MassiveNumbers
 };
 enum StatNumbers
 {
-	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH, MODE
+	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH, MODE, SIN
 };
 
 /*
@@ -64,6 +64,7 @@ void SayHello()
 	cout << "Квадратный корень:        [sqrt]\n";
 	cout << "Квадратное уравнение:     [quad]\n";
 	cout << "Теорема Пифагора:         [pyth]\n";
+	cout << "Синус угла:                [sin]\n";
 	cout << "Сменить метод ввода:    [switch]\n";
 	cout << "Помощь:                      [h]\n";
 	cout << "Выход:                     [esc]\n";
@@ -235,6 +236,7 @@ private:
 		cout << "Square Root: " << stats[SQRT] << endl;
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
+		cout << "Sinus: " << stats[SIN] << endl;
 	}
 	void GeneralStats()
 	{
@@ -246,7 +248,7 @@ private:
 		int minutes = (int)durat / 60;
 		int secondes = (int)durat % 60;
 
-		int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH];
+		int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] + stats[SIN];
 
 		cout << "Programming language: C++\n";
 		cout << "Name: CALCULATORcpp\n";
@@ -554,6 +556,22 @@ private:
 			stats[ERR]++;
 		}
 	}
+	void Sinus()
+	{
+		ClearCMD();
+		sep();
+
+		cout << "Синус: sin a\n";
+		cout << "Введите а: ";
+		mas[A] = GetFloat();
+
+		mas[ANS] = sin(mas[A]);
+		cout << "Ответ: sin" << mas[A] << " = " << mas[ANS] << endl;
+
+		stats[SIN]++;
+		AddHistory("sin" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		sep();
+	}
 
 	// история
 	void AddHistory(string op)
@@ -732,6 +750,9 @@ public:
 			Quad();
 		else if (cmd == "pyth" || cmd == "8" || getchCMD == '8')
 			PyTh();
+		else if (cmd == "sin" || cmd == "9" || getchCMD == '9')
+			Sinus();
+
 		// исключение
 		else
 		{
@@ -747,7 +768,6 @@ public:
 INT MAIN() {...}
 ====================================
 */
-
 int main()
 {
 	cout << "\033[92mLoading...\033[0m\n";

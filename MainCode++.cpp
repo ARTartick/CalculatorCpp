@@ -12,85 +12,120 @@
 
 using namespace std;
 
-/*
-====================================
-КОНСТАНТЫ И ПЕРЕМЕННЫЕ
-====================================
-*/
+//==================================
+// КОНСТАНТЫ
+//==================================
+const string version = "3.0.0";
+const int STATS_COUNT = 9;
 
-const string version = "2.3.2"; // версия
-const int STATS_COUNT = 10;
+//==================================
+// ПЕРЕМЕННЫЕ И МАССИВЫ
+//==================================
 
-// Перечисления
-enum MassiveNumbers
+time_t session_start;
+
+int settings[3] = { 0 };
+int stats[STATS_COUNT]{ 0 };
+float mas[6] = { 0.0f };
+
+vector<string> history;
+
+//==================================
+// ENUMS
+//==================================
+enum MassiveNums
 {
 	A, B, C, ANS, X2, DISCR
 };
-enum StatNumbers
+enum StatsNums
 {
-	ADD, MIN, MULT, DIV, ERR, POW, SQRT, QUAD, PYTH, MODE, SIN
+	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PYTH, SIN
+};
+enum SettingsNums
+{
+	ENT, CALC, ERR
 };
 
-/*
-====================================
-ФУНКЦИИ И КЛАССЫ
-====================================
-*/
+//==================================================
+// КЛАССЫ
+//==================================================
 
-// функции и утилиты
-void sep()
+class Calculator
 {
-	cout << "\n------------------------------------------\n\n";
-}
-void ClearCMD()
-{
-#ifdef _WIN32
-	system("cls");
-#else
-	system("clear");
-#endif
-	cout << "++======================================++\n";
-	cout << "||      CalculatorCpp версии " << version << "      || \n";
-	cout << "++======================================++\n";
-}
-void SayHello()
-{
-	cout << "\nДоступные комманды:\n";
-	cout << "Сложение:                  [sum]\n";
-	cout << "Вычитание:                 [sub]\n";
-	cout << "Умножение:                [mult]\n";
-	cout << "Деление:                   [div]\n";
-	cout << "Возведение в степень:      [pow]\n";
-	cout << "Квадратный корень:        [sqrt]\n";
-	cout << "Квадратное уравнение:     [quad]\n";
-	cout << "Теорема Пифагора:         [pyth]\n";
-	cout << "Синус угла:                [sin]\n";
-	cout << "Сменить метод ввода:    [switch]\n";
-	cout << "Помощь:                      [h]\n";
-	cout << "Выход:                     [esc]\n";
-	cout << "--------------------------------\n";
-	cout << "Введите команду: ";
-}
-
-// классы
-
-class Operator
-{
-private:
+protected:
 	// переменные
 	string cmd;
-	time_t session_start;
 	char getchCMD;
-	bool inDebug;
-	bool is_works;
+	bool works;
 
-	// массивы
-	int stats[STATS_COUNT];
-	float mas[6];
-	// векторы и т.д.
-	vector<string> history;
 
 	// утилиты
+	void sep()
+	{
+		cout << "\n------------------------------------------\n\n";
+	}
+	void ClearCMD()
+	{
+		#ifdef _WIN32
+			system("cls");
+		#else
+			system("clear");
+		#endif
+			cout << "++======================================++\n";
+			cout << "||      CalculatorCpp версии " << version << "      || \n";
+			cout << "++======================================++\n";
+	}
+	void GetCMD()
+	{
+		if (settings[ENT] == 0) // standart
+		{
+			cin >> cmd;
+		}
+		else if (settings[ENT] == 1) // fast
+		{
+			getchCMD = _getch();
+			cmd = string(1, getchCMD);
+		}
+
+		if (cmd == "d")
+			settings[CALC] = -10;
+	}
+	void ChangeCalc(char a)
+	{
+		if (a == '-')
+			settings[CALC] -= 1;
+		else if (a == '+')
+			settings[CALC] += 1;
+
+		if (settings[CALC] < 0)
+			settings[CALC] = 3;
+		else if (settings[CALC] > 3)
+			settings[CALC] = 0;
+
+		ClearCMD();
+		sep();
+	}
+	void SwitchEnterMode()
+	{
+		if (settings[ENT] == 0)
+		{
+			settings[ENT] = 1;
+			ClearCMD();
+			sep();
+			cout << "\033[92mБыстрый режим ввода\033[0m\n";
+			cmd = " ";
+			getchCMD = ' ';
+		}
+		else if (settings[ENT] == 1)
+		{
+			settings[ENT] = 0;
+			ClearCMD();
+			sep();
+			cout << "\033[92mСтандартный режим ввода\033[0m\n";
+			cmd = " ";
+			getchCMD = ' ';
+		}
+	}
 	float GetFloat()
 	{
 		float val;
@@ -102,7 +137,7 @@ private:
 			if (cin.fail())
 			{
 				cout << "\033[91mОшибка: введите число\033[0m\n";
-				stats[ERR]++;
+				settings[ERR]++;
 
 				cin.clear();
 				cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -119,187 +154,155 @@ private:
 		ss << fixed << setprecision(2) << val;
 		return ss.str();
 	}
-	void DebugMode()
+
+	// история и сохрания/загрузка
+	void Load(string cmd)
 	{
-		ClearCMD();
-		sep();
-		cout << "\033[92mYOU ENTERED DEBUG-MODE\033[0m\n";
-		inDebug = true;
-
-		while (inDebug)
+		if (cmd == "history")
 		{
-			sep();
-
-			cout << "\033[96mDEBUG MODE MENU\033[0m";
-			cout << "\n[1] Просмотр массива\n";
-			cout << "[2] Статистика вычислений\n";
-			cout << "[3] Общая статистика\n";
-			cout << "[4] История вычислений\n";
-			cout << "[5] Очистить историю и статистику\n";
-			cout << "[0] Выход из debug mode\n";
-			cout << "Введите команду: ";
-			getchCMD = _getch();
-			ClearCMD();
-
-			switch (getchCMD)
+			ifstream inFile("history.txt");
+			if (!inFile.is_open())
 			{
-			case '0': QuitDebugMode(); break;
-			case '1': ShowArray(); break;
-			case '2': CalcStats(); break;
-			case '3': GeneralStats(); break;
-			case '4': ShowHistory(); break;
-			case '5': ClearStats(); break;
-			default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; stats[ERR]++;
+				return;
 			}
+
+			size_t count;
+			inFile >> count;
+			inFile.ignore();
+
+			history.clear();
+			history.reserve(count);
+
+			string line;
+			for (size_t i = 0; i < count; ++i)
+			{
+				if (getline(inFile, line))
+				{
+					history.push_back(line);
+				}
+			}
+			inFile.close();
 		}
-	}
-	void SetData()
-	{
-		is_works = true;
-		session_start = time(nullptr);
-		getchCMD = ' ';
-		inDebug = true;
-		for (int i = 0; i < 6; i++)
+		else if (cmd == "stats")
 		{
-			mas[i] = 0;
+			ifstream inFile("stats.txt");
+			if (!inFile.is_open())
+			{
+				return;
+			}
+
+			for (int i = 0; i < STATS_COUNT; i++)
+			{
+				if (!(inFile >> stats[i]))
+				{
+					stats[i] = 0;
+				}
+			}
+			inFile.close();
 		}
-		for (int i = 0; i < STATS_COUNT; i++)
+		else if (cmd == "settings")
 		{
-			stats[i] = 0;
+			ifstream inFile("settings.txt");
+			if (!inFile.is_open())
+			{
+				return;
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (!(inFile >> settings[i]))
+				{
+					settings[i] = 0;
+				}
+			}
+			inFile.close();
 		}
 	}
-	void GetCMD()
+	void AddHistory(string op)
 	{
-		if (stats[MODE] == 0) // standart
+		history.push_back(op);
+		if (history.size() > 10)
 		{
-			cin >> cmd;
+			history.erase(history.begin());
 		}
-		else if (stats[MODE] == 1) // fast
+	}
+	void Save(string cmd, string outs)
+	{
+		if (cmd == "history")
 		{
-			getchCMD = _getch();
+			ofstream outFile("history.txt");
+			if (!outFile.is_open())
+			{
+				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи истории\033[0m\n";
+				return;
+			}
+
+			outFile << history.size() << "\n";
+
+			for (const string& record : history)
+			{
+				outFile << record << "\n";
+			}
+			outFile.close();
+			if (outs == "YES")
+				cout << "\n\033[93mИстория сохранена!\033[0m\n";
 		}
-	}
-	void HelpMePls()
-	{
-		ClearCMD();
-		cout << "\nКраткая сводка по калькулятору:\n";
-
-		cout << "--------------------------------\n";
-		cout << "Основные команды: \n";
-		cout << "Сложение:                  [sum]\n";
-		cout << "Вычитание:                 [sub]\n";
-		cout << "Умножение:                [mult]\n";
-		cout << "Деление:                   [div]\n";
-		cout << "Возведение в степень:      [pow]\n";
-		cout << "Квадратный корень:        [sqrt]\n";
-		cout << "Квадратное уравнение:     [quad]\n";
-		cout << "Теорема Пифагора:         [pyth]\n";
-
-		cout << "\nСменить метод ввода:    [switch]\n";
-		cout << "Помощь:                      [h]\n";
-		cout << "Дебаг-мод:                   [d]\n";
-		cout << "Выход:                     [esc]\n";
-		cout << "--------------------------------\n";
-
-		cout << "P.S. я хуй его знает зачем добавил эту бесполезнейшую функцию :|\n";
-	}
-
-	// команды дебага
-	void ShowArray()
-	{
-		cout << "\n\033[93m=ShowArray\033[0m\n";
-
-		cout << "a: " << mas[A] << endl;
-		cout << "b: " << mas[B] << endl;
-		cout << "c: " << mas[C] << endl;
-		cout << "Last Answer: " << mas[ANS] << endl;
-		cout << "Last second Answer: " << mas[X2] << endl;
-		cout << "Discr: " << mas[DISCR] << endl;
-	}
-	void CalcStats()
-	{
-		cout << "\n\033[93m=CalcStats\033[0m\n";
-		int a = 0;
-		for (int i = 0; i < STATS_COUNT; i++)
+		else if (cmd == "stats")
 		{
-			if (i == 9)
-				continue;
-			a = a + stats[i];
+			ofstream outFile("stats.txt");
+			if (!outFile.is_open())
+			{
+				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи статистики\033[0m\n";
+				return;
+			}
+
+			for (int i = 0; i < STATS_COUNT; i++)
+			{
+				outFile << stats[i] << "\n";
+			}
+			outFile.close();
+			if (outs == "YES")
+				cout << "\033[93mСтатистика сохранена!\033[0m\n";
 		}
-
-		cout << "Total operations: " << a << endl;
-		cout << "Addition: " << stats[ADD] << endl;
-		cout << "Substraction: " << stats[MIN] << endl;
-		cout << "Multiplication: " << stats[MULT] << endl;
-		cout << "Division: " << stats[DIV] << endl;
-		cout << "Power: " << stats[POW] << endl;
-		cout << "Square Root: " << stats[SQRT] << endl;
-		cout << "Quadratic Equation: " << stats[QUAD] << endl;
-		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
-		cout << "Sinus: " << stats[SIN] << endl;
-	}
-	void GeneralStats()
-	{
-		cout << "\n\033[93m=GeneralStats\033[0m\n";
-
-		time_t now = time(nullptr);
-		double durat = difftime(now, session_start);
-
-		int minutes = (int)durat / 60;
-		int secondes = (int)durat % 60;
-
-		int total = stats[ADD] + stats[MIN] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] + stats[SIN];
-
-		cout << "Programming language: C++\n";
-		cout << "Name: CALCULATORcpp\n";
-		cout << "Version: " << version << endl;
-		cout << "Session duration: " << minutes << "min " << secondes << "sec" << endl;
-		cout << "Enter mode: ";
-		switch (stats[MODE])
+		else if (cmd == "settings")
 		{
-		case 0: cout << "standart\n"; break;
-		case 1: cout << "fast\n"; break;
+			ofstream outFile("settings.txt");
+			if (!outFile.is_open())
+			{
+				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи настроек\033[0m\n";
+				return;
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				outFile << settings[i] << "\n";
+			}
+			outFile.close();
+			if (outs == "YES")
+				cout << "\033[93mНастройки сохранены!\033[0m\n";
 		}
-		cout << "Total operations: " << total << endl;
-		cout << "Total errors: " << stats[ERR] << endl;
 	}
-	void ShowHistory()
+};
+
+class ArithmeticCalc : public Calculator
+{
+private:
+
+	void CommandList()
 	{
-		cout << "\n\033[93m=ShowHistory\033[0m\n";
+		cout << "\033[93mАРИФМЕТИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
+		cout << "Список доступных комманд:\n\n";
+		cout << "Сложение:                  [1]\n";
+		cout << "Вычитание:                 [2]\n";
+		cout << "Умножение:                 [3]\n";
+		cout << "Деление:                   [4]\n";
 
-		if (history.empty())
-		{
-			cout << "\033[91mИстория операций пока что пуста...\033[0m" << endl;
-		}
-		int num = 1;
-		for (auto it = history.rbegin(); it != history.rend(); ++it, ++num)
-		{
-			cout << "[" << num << "] " << *it << endl;
-		}
-	}
-	void ClearStats()
-	{
-		cout << "\n\033[93m=ClearStats\033[0m\n";
-
-		history.clear();
-		cout << "История успешно очищена\n";
-
-		for (int i = 0; i < STATS_COUNT; i++)
-		{
-			stats[i] = 0;
-		}
-		cout << "Статистика успешно очищена\n";
-
-	}
-	void QuitDebugMode()
-	{
-		cout << "\n=======================\n";
-		cout << "\033[93mВЫ ВЫШЛИ ИЗ DEBUG MODE\033[0m";
-		cout << "\n=======================\n\n";
-		inDebug = false;
+		cout << endl;
+		cout << "Смена калькулятора:    [-]/[+]\n";
+		cout << "Смена режима ввода:        [s]\n";
+		cout << "Выход:                 [e]/[0]\n";
 	}
 
-	// основные команды
 	void Summa()
 	{
 		ClearCMD();
@@ -318,12 +321,12 @@ private:
 		AddHistory(FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
-	void Minus()
+	void Substraction()
 	{
 		ClearCMD();
 		sep();
 
-		cout << "Вычитание: a - b\n";
+		cout << "Вычитание: а - b\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
@@ -332,7 +335,7 @@ private:
 		mas[ANS] = mas[A] - mas[B];
 		cout << "Ответ: " << mas[A] << " - " << mas[B] << " = " << mas[ANS] << endl;
 
-		stats[MIN]++;
+		stats[SUB]++;
 		AddHistory(FormatFloat(mas[A]) + " - " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
@@ -341,7 +344,7 @@ private:
 		ClearCMD();
 		sep();
 
-		cout << "Умножение: a * b\n";
+		cout << "Умножение: а * b\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
@@ -354,25 +357,16 @@ private:
 		AddHistory(FormatFloat(mas[A]) + " * " + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
-	void Divide()
+	void Division()
 	{
 		ClearCMD();
 		sep();
 
-		cout << "Деление: a / b\n";
+		cout << "Деление: а / b\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
 		mas[B] = GetFloat();
-
-		if (mas[B] == 0)
-		{
-			cout << "\033[91mОшибка: деление на ноль невозможно!\033[0m\n";
-			AddHistory(FormatFloat(mas[A]) + "/0 = ERR");
-			stats[ERR]++;
-			sep();
-			return;
-		}
 
 		mas[ANS] = mas[A] / mas[B];
 		cout << "Ответ: " << mas[A] << " / " << mas[B] << " = " << mas[ANS] << endl;
@@ -386,7 +380,7 @@ private:
 		ClearCMD();
 		sep();
 
-		cout << "Возведение в степень: a^b\n";
+		cout << "Возведение в степень: а^b\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
@@ -399,32 +393,104 @@ private:
 		AddHistory(FormatFloat(mas[A]) + "^" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
-	void Sqrt()
+	void SqRt()
 	{
 		ClearCMD();
 		sep();
 
-		cout << "Квадратный корень: √а\n";
+		cout << "Корень: ?а\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
 
-		if (mas[A] < 0)
-		{
-			mas[ANS] = sqrt(abs(mas[A]));
-			cout << "Результат: √" << mas[A] << " = " << mas[ANS] << "i" << endl;
-			stats[SQRT]++;
-			AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]) + "i");
-		}
-		else
-		{
-			mas[ANS] = sqrt(mas[A]);
-			cout << "Ответ: √" << mas[A] << " = " << mas[ANS] << endl;
+		mas[ANS] = sqrt(mas[A]);
+		cout << "Ответ: ?" << mas[A] << " = " << mas[ANS] << endl;
 
-			stats[SQRT]++;
-			AddHistory("√" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
-		}
+		stats[SQRT]++;
+		AddHistory("?" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
+
+public:
+	ArithmeticCalc()
+	{
+		Load("history");
+		Load("stats");
+		Load("settings");
+
+		session_start = time(nullptr);
+		cout << "\033[92mLoading done\033[0m\n";
+		ClearCMD();
+		sep();
+	}
+	~ArithmeticCalc()
+	{
+		Save("history", "YES");
+		Save("stats", "YES");
+		Save("settings", "YES");
+
+		sep();
+		cout << "Выход из программы...\n";
+		cout << "До встречи, пользователь!\n";
+		sep();
+
+		cout << "Спасибо за использование CalculatorCpp\n";
+	}
+
+	bool MainCode()
+	{
+		Save("history", "NO");
+		Save("stats", "NO");
+		Save("settings", "NO");
+
+		CommandList();
+		cout << "\nВведите команду: ";
+		GetCMD();
+		if (cmd == "0" || cmd == "e")
+			return false;
+		else if (cmd == "s")
+			SwitchEnterMode();
+
+		else if (cmd == "1")
+			Summa();
+		else if (cmd == "2")
+			Substraction();
+		else if (cmd == "3")
+			Multiply();
+		else if (cmd == "4")
+			Division();
+		else if (cmd == "5")
+			Power();
+		else if (cmd == "6")
+			SqRt();
+		else if (cmd == "-")
+			ChangeCalc('-');
+		else if (cmd == "+")
+			ChangeCalc('+');
+
+		else
+		{
+			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
+		}
+		
+		return true;
+	}
+};
+
+class Algebra : public Calculator
+{
+private:
+	void CommandList()
+	{
+		cout << "\033[93mАЛГЕБРАИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
+		cout << "Список доступных комманд:\n\n";
+		cout << "Квадратные уравнения:      [1]\n";
+
+		cout << endl;
+		cout << "Смена калькулятора:    [-]/[+]\n";
+		cout << "Смена режима ввода:        [s]\n";
+		cout << "Выход:                 [e]/[0]\n";
+	}
+
 	void Quad()
 	{
 		ClearCMD();
@@ -489,13 +555,61 @@ private:
 			}
 		}
 	}
+
+public:
+	bool MainCode()
+	{
+		Save("history", "NO");
+		Save("stats", "NO");
+		Save("settings", "NO");
+
+		CommandList();
+		cout << "\nВведите команду: ";
+		GetCMD();
+		if (cmd == "0" || cmd == "e")
+			return false;
+		else if (cmd == "s")
+			SwitchEnterMode();
+
+		else if (cmd == "-")
+			ChangeCalc('-');
+		else if (cmd == "+")
+			ChangeCalc('+');
+
+		else if (cmd == "1")
+			Quad();
+
+		else
+		{
+			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
+		}
+
+		return true;
+	}
+};
+
+class Geometry : public Calculator
+{
+private:
+	void CommandList()
+	{
+		cout << "\033[93mГЕОМЕТРИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
+		cout << "Список доступных комманд:\n\n";
+		cout << "Теорема Пифагора:          [1]\n";
+
+		cout << endl;
+		cout << "Смена калькулятора:    [-]/[+]\n";
+		cout << "Смена режима ввода:        [s]\n";
+		cout << "Выход:                 [e]/[0]\n";
+	}
+
 	void PyTh()
 	{
 		ClearCMD();
 		sep();
 		char num;
 
-		cout << "Теорема Пифагора: AB^^2 + BC^^2 = AC^^2\n";
+		cout << "Теорема Пифагора: AB^2 + BC^2 = AC^2\n";
 		cout << "Катет - 1\n";
 		cout << "Гипотенуза - 2\n";
 		cout << "Выберете, что хотите найти: ";
@@ -505,7 +619,7 @@ private:
 		{
 			ClearCMD();
 			sep();
-			cout << "Теорема Пифагора: BC^^2 = AC^^2 - AB^^2\n";
+			cout << "Теорема Пифагора: BC^2 = AC^2 - AB^2\n";
 			cout << "Выберете, что хотите найти: " << num << endl;
 
 
@@ -523,7 +637,7 @@ private:
 
 			mas[ANS] = (pow(mas[C], 2) - pow(mas[A], 2));
 
-			cout << "BC^^2 = " << pow(mas[C], 2) << " - " << pow(mas[A], 2) << " = " << mas[ANS] << endl;
+			cout << "BC^2 = " << pow(mas[C], 2) << " - " << pow(mas[A], 2) << " = " << mas[ANS] << endl;
 			cout << "BC = √" << mas[ANS] << " или же " << sqrt(mas[ANS]);
 
 			stats[PYTH]++;
@@ -533,7 +647,7 @@ private:
 		{
 			ClearCMD();
 			sep();
-			cout << "Теорема Пифагора: AB^^2 + BC^^2 = AC^^2\n";
+			cout << "Теорема Пифагора: AB^2 + BC^2 = AC^2\n";
 			cout << "Выберете, что хотите найти: " << num << endl;
 
 			cout << "Введите длину катета: ";
@@ -544,7 +658,7 @@ private:
 
 			mas[ANS] = pow(mas[A], 2) + pow(mas[B], 2);
 
-			cout << "AC^^2 = " << pow(mas[A], 2) << " + " << pow(mas[B], 2) << " = " << mas[ANS] << endl;
+			cout << "AC^2 = " << pow(mas[A], 2) << " + " << pow(mas[B], 2) << " = " << mas[ANS] << endl;
 			cout << "AC = √" << mas[ANS] << " или же " << sqrt(mas[ANS]);
 
 			AddHistory("AC = √" + FormatFloat(mas[ANS]) + " или же " + FormatFloat(sqrt(mas[ANS])));
@@ -556,6 +670,52 @@ private:
 			stats[ERR]++;
 		}
 	}
+
+public:
+	bool MainCode()
+	{
+		Save("history", "NO");
+		Save("stats", "NO");
+		Save("settings", "NO");
+		CommandList();
+		cout << "\nВведите команду: ";
+		GetCMD();
+		if (cmd == "0" || cmd == "e")
+			return false;
+		else if (cmd == "s")
+			SwitchEnterMode();
+
+		else if (cmd == "-")
+			ChangeCalc('-');
+		else if (cmd == "+")
+			ChangeCalc('+');
+
+		else if (cmd == "1")
+			PyTh();
+
+		else
+		{
+			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
+		}
+
+		return true;
+	}
+};
+
+class Trigonometry : public Calculator
+{
+	void CommandList()
+	{
+		cout << "\033[93mТРИГОНОМЕТРИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
+		cout << "Список доступных комманд:\n\n";
+		cout << "Синус:                     [1]\n";
+
+		cout << endl;
+		cout << "Смена калькулятора:    [-]/[+]\n";
+		cout << "Смена режима ввода:        [s]\n";
+		cout << "Выход:                 [e]/[0]\n";
+	}
+
 	void Sinus()
 	{
 		ClearCMD();
@@ -573,212 +733,207 @@ private:
 		sep();
 	}
 
-	// история
-	void AddHistory(string op)
-	{
-		history.push_back(op);
-		if (history.size() > 10)
-		{
-			history.erase(history.begin());
-		}
-	}
-	void Save(string cmd, string outs)
-	{
-		if (cmd == "history")
-		{
-			ofstream outFile("history.txt");
-			if (!outFile.is_open())
-			{
-				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи истории\033[0m\n";
-				return;
-			}
-
-			outFile << history.size() << "\n";
-
-			for (const string& record : history)
-			{
-				outFile << record << "\n";
-			}
-			outFile.close();
-			if (outs == "YES")
-				cout << "\n\033[93mИстория сохранена!\033[0m\n";
-		}
-		else if (cmd == "stats")
-		{
-			ofstream outFile("stats.txt");
-			if (!outFile.is_open())
-			{
-				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи статистики\033[0m\n";
-				return;
-			}
-
-			for (int i = 0; i < STATS_COUNT; i++)
-			{
-				outFile << stats[i] << "\n";
-			}
-			outFile.close();
-			if (outs == "YES")
-				cout << "\033[93mСтатистика сохранена!\033[0m\n";
-		}
-	}
-	void Load(string cmd)
-	{
-		if (cmd == "history")
-		{
-			ifstream inFile("history.txt");
-			if (!inFile.is_open())
-			{
-				return;
-			}
-
-			size_t count;
-			inFile >> count;
-			inFile.ignore();
-
-			history.clear();
-			history.reserve(count);
-
-			string line;
-			for (size_t i = 0; i < count; ++i)
-			{
-				if (getline(inFile, line))
-				{
-					history.push_back(line);
-				}
-			}
-			inFile.close();
-		}
-		else if (cmd == "stats")
-		{
-			ifstream inFile("stats.txt");
-			if (!inFile.is_open())
-			{
-				return;
-			}
-
-			for (int i = 0; i < STATS_COUNT; i++)
-			{
-				if (!(inFile >> stats[i]))
-				{
-					stats[i] = 0;
-				}
-			}
-			inFile.close();
-		}
-	}
-
 public:
-	// конструктор
-	Operator()
-	{
-		SetData();
-
-		Load("history");
-		Load("stats");
-
-		ClearCMD();
-	}
-	// деструктор
-	~Operator()
-	{
-		Save("history", "YES");
-		Save("stats", "YES");
-
-		sep();
-		cout << "Выход из программы...\n";
-		cout << "До встречи, пользователь!\n";
-		sep();
-
-		cout << "Спасибо за использование CalculatorCpp\n";
-	}
-
-	// is_works
-	bool isRunning() const
-	{
-		return is_works;
-	}
-
-	// основная функция
-	void Operations()
+	bool MainCode()
 	{
 		Save("history", "NO");
 		Save("stats", "NO");
-
-		SayHello();
+		Save("settings", "NO");
+		CommandList();
+		cout << "\nВведите команду: ";
 		GetCMD();
+		if (cmd == "0" || cmd == "e")
+			return false;
+		else if (cmd == "s")
+			SwitchEnterMode();
 
-		// выход
-		if (cmd == "esc" || cmd == "0" || getchCMD == '0')
-			is_works = false;
-		// дебаг
-		else if (cmd == "d" || cmd == "в" || getchCMD == 'd' || getchCMD == 'в')
-			DebugMode();
-		else if (cmd == "switch" || cmd == "s" || cmd == "ы" || getchCMD == 's' || getchCMD == 'ы')
-		{
-			if (stats[MODE] == 0)
-			{
-				stats[MODE] = 1;
-				cmd = " ";
-				ClearCMD();
-				cout << "\033[93mРежим ввода сменён на быстрый\033[0m\n";
-			}
-			else if (stats[MODE] == 1)
-			{
-				stats[MODE] = 0;
-				cmd = " ";
-				ClearCMD();
-				cout << "\033[93mРежим ввода сменён на стандартный\033[0m\n";
-			}
-		}
-		else if (cmd == "h" || getchCMD == 'р' || getchCMD == 'h')
-			HelpMePls();
+		else if (cmd == "-")
+			ChangeCalc('-');
+		else if (cmd == "+")
+			ChangeCalc('+');
 
-		// прочие функции
-		else if (cmd == "sum" || cmd == "1" || getchCMD == '1')
-			Summa();
-		else if (cmd == "sub" || cmd == "2" || getchCMD == '2')
-			Minus();
-		else if (cmd == "mult" || cmd == "3" || getchCMD == '3')
-			Multiply();
-		else if (cmd == "div" || cmd == "4" || getchCMD == '4')
-			Divide();
-		else if (cmd == "pow" || cmd == "5" || getchCMD == '5')
-			Power();
-		else if (cmd == "sqrt" || cmd == "6" || getchCMD == '6')
-			Sqrt();
-		else if (cmd == "quad" || cmd == "7" || getchCMD == '7')
-			Quad();
-		else if (cmd == "pyth" || cmd == "8" || getchCMD == '8')
-			PyTh();
-		else if (cmd == "sin" || cmd == "9" || getchCMD == '9')
+		else if (cmd == "1")
 			Sinus();
 
-		// исключение
 		else
 		{
-			ClearCMD();
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
-			stats[ERR]++;
 		}
+
+		return true;
 	}
 };
 
-/*
-====================================
-INT MAIN() {...}
-====================================
-*/
+class DebugMode : public Calculator
+{
+private:
+
+	bool inDebug = true;
+
+	void ShowArray()
+	{
+		cout << "\n\033[93m=ShowArray\033[0m\n";
+
+		cout << "a: " << mas[A] << endl;
+		cout << "b: " << mas[B] << endl;
+		cout << "c: " << mas[C] << endl;
+		cout << "Last Answer: " << mas[ANS] << endl;
+		cout << "Last second Answer: " << mas[X2] << endl;
+		cout << "Discr: " << mas[DISCR] << endl;
+	}
+	void CalcStats()
+	{
+		cout << "\n\033[93m=CalcStats\033[0m\n";
+		int a = 0;
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			if (i == 9)
+				continue;
+			a = a + stats[i];
+		}
+
+		cout << "Total operations: " << a << endl;
+		cout << "Addition: " << stats[ADD] << endl;
+		cout << "Substraction: " << stats[SUB] << endl;
+		cout << "Multiplication: " << stats[MULT] << endl;
+		cout << "Division: " << stats[DIV] << endl;
+		cout << "Power: " << stats[POW] << endl;
+		cout << "Square Root: " << stats[SQRT] << endl;
+		cout << "Quadratic Equation: " << stats[QUAD] << endl;
+		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
+		cout << "Sinus: " << stats[SIN] << endl;
+	}
+	void GeneralStats()
+	{
+		cout << "\n\033[93m=GeneralStats\033[0m\n";
+
+		time_t now = time(nullptr);
+		double durat = difftime(now, session_start);
+
+		int minutes = (int)durat / 60;
+		int secondes = (int)durat % 60;
+
+		int total = stats[ADD] + stats[SUB] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] + stats[SIN];
+
+		cout << "Programming language: C++\n";
+		cout << "Name: CALCULATORcpp\n";
+		cout << "Version: " << version << endl;
+		cout << "Session duration: " << minutes << "min " << secondes << "sec" << endl;
+		cout << "Enter mode: ";
+		switch (settings[ENT])
+		{
+		case 0: cout << "standart\n"; break;
+		case 1: cout << "fast\n"; break;
+		}
+		cout << "Total operations: " << total << endl;
+		cout << "Total errors: " << settings[ERR] << endl;
+	}
+	void ShowHistory()
+	{
+		cout << "\n\033[93m=ShowHistory\033[0m\n";
+
+		if (history.empty())
+		{
+			cout << "\033[91mИстория операций пока что пуста...\033[0m" << endl;
+		}
+		int num = 1;
+		for (auto it = history.rbegin(); it != history.rend(); ++it, ++num)
+		{
+			cout << "[" << num << "] " << *it << endl;
+		}
+	}
+	void ClearStats()
+	{
+		cout << "\n\033[93m=ClearStats\033[0m\n";
+
+		history.clear();
+		cout << "История успешно очищена\n";
+
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			stats[i] = 0;
+		}
+		cout << "Статистика успешно очищена\n";
+
+	}
+	void QuitDebugMode()
+	{
+		cout << "\n=======================\n";
+		cout << "\033[93mВЫ ВЫШЛИ ИЗ DEBUG MODE\033[0m";
+		cout << "\n=======================\n\n";
+		inDebug = false;
+	}
+
+public:
+	void MainCode()
+	{
+		ClearCMD();
+		sep();
+		cout << "\033[93mYOU ENTERED DEBUG-MODE\033[0m\n";
+		inDebug = true;
+
+		while (inDebug)
+		{
+			sep();
+
+			cout << "\033[96mDEBUG MODE MENU\033[0m";
+			cout << "\n[1] Просмотр массива\n";
+			cout << "[2] Статистика вычислений\n";
+			cout << "[3] Общая статистика\n";
+			cout << "[4] История вычислений\n";
+			cout << "[5] Очистить историю и статистику\n";
+			cout << "[0] Выход из debug mode\n";
+			cout << "Введите команду: ";
+			getchCMD = _getch();
+			ClearCMD();
+
+			switch (getchCMD)
+			{
+			case '0': QuitDebugMode(); break;
+			case '1': ShowArray(); break;
+			case '2': CalcStats(); break;
+			case '3': GeneralStats(); break;
+			case '4': ShowHistory(); break;
+			case '5': ClearStats(); break;
+			default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; settings[ERR]++;
+			}
+		}
+
+		settings[CALC] = 0;
+	}
+};
+
+//====================================================
+// ФУНКЦИИ
+//====================================================
+
 int main()
 {
+	cout << "\033[92mLoading has started...\033[0m\n";
+
+	setlocale(LC_ALL, "RU");
+
 	cout << "\033[92mLoading...\033[0m\n";
+	bool is_works = true;
 
-	setlocale(LC_ALL, "RU"); // русский язык
-	Operator op; // создание объекта
+	Algebra al;
+	Geometry gy;
+	Trigonometry ty;
+	DebugMode dm;
+	ArithmeticCalc ac;
 
-	//основной цикл
-	while (op.isRunning())
+	while (is_works)
 	{
-		op.Operations();
+		if (settings[CALC] == 0)
+			is_works = ac.MainCode();
+		else if (settings[CALC] == 1)
+			is_works = al.MainCode();
+		else if (settings[CALC] == 2)
+			is_works = gy.MainCode();
+		else if (settings[CALC] == 3)
+			is_works = ty.MainCode();
+		else if (settings[CALC] == -10)
+			dm.MainCode();
 	}
 
 	return 0;

@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.0.0";
+const string version = "3.0.1";
 const int STATS_COUNT = 9;
 
 //==================================
@@ -156,66 +156,64 @@ protected:
 	}
 
 	// история и сохрания/загрузка
-	void Load(string cmd)
+	void Load()
 	{
-		if (cmd == "history")
+		// HISTORY
 		{
 			ifstream inFile("history.txt");
-			if (!inFile.is_open())
+			if (inFile.is_open())
 			{
-				return;
-			}
+				size_t count;
+				inFile >> count;
+				inFile.ignore();
 
-			size_t count;
-			inFile >> count;
-			inFile.ignore();
+				history.clear();
+				history.reserve(count);
 
-			history.clear();
-			history.reserve(count);
-
-			string line;
-			for (size_t i = 0; i < count; ++i)
-			{
-				if (getline(inFile, line))
+				string line;
+				for (size_t i = 0; i < count; ++i)
 				{
-					history.push_back(line);
+					if (getline(inFile, line))
+					{
+						history.push_back(line);
+					}
 				}
+				inFile.close();
 			}
-			inFile.close();
 		}
-		else if (cmd == "stats")
+
+		//=====================================
+		// STATS
 		{
 			ifstream inFile("stats.txt");
-			if (!inFile.is_open())
+			if (inFile.is_open())
 			{
-				return;
-			}
-
-			for (int i = 0; i < STATS_COUNT; i++)
-			{
-				if (!(inFile >> stats[i]))
+				for (int i = 0; i < STATS_COUNT; i++)
 				{
-					stats[i] = 0;
+					if (!(inFile >> stats[i]))
+					{
+						stats[i] = 0;
+					}
 				}
+				inFile.close();
 			}
-			inFile.close();
 		}
-		else if (cmd == "settings")
+
+		//========================================
+		// SETTINGS
 		{
 			ifstream inFile("settings.txt");
-			if (!inFile.is_open())
+			if (inFile.is_open())
 			{
-				return;
-			}
-
-			for (int i = 0; i < 3; i++)
-			{
-				if (!(inFile >> settings[i]))
+				for (int i = 0; i < 3; i++)
 				{
-					settings[i] = 0;
+					if (!(inFile >> settings[i]))
+					{
+						settings[i] = 0;
+					}
 				}
+				inFile.close();
 			}
-			inFile.close();
 		}
 	}
 	void AddHistory(string op)
@@ -226,61 +224,61 @@ protected:
 			history.erase(history.begin());
 		}
 	}
-	void Save(string cmd, string outs)
+	void Save(string outs)
 	{
-		if (cmd == "history")
+		// HISTORY
+		ofstream outFileHist("history.txt");
+		if (!outFileHist.is_open())
 		{
-			ofstream outFile("history.txt");
-			if (!outFile.is_open())
-			{
-				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи истории\033[0m\n";
-				return;
-			}
-
-			outFile << history.size() << "\n";
-
-			for (const string& record : history)
-			{
-				outFile << record << "\n";
-			}
-			outFile.close();
-			if (outs == "YES")
-				cout << "\n\033[93mИстория сохранена!\033[0m\n";
+			cerr << "\n\033[91mОшибка: не удалось открыть файл для записи истории\033[0m\n";
+			return;
 		}
-		else if (cmd == "stats")
+
+		outFileHist << history.size() << "\n";
+
+		for (const string& record : history)
 		{
-			ofstream outFile("stats.txt");
-			if (!outFile.is_open())
-			{
-				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи статистики\033[0m\n";
-				return;
-			}
-
-			for (int i = 0; i < STATS_COUNT; i++)
-			{
-				outFile << stats[i] << "\n";
-			}
-			outFile.close();
-			if (outs == "YES")
-				cout << "\033[93mСтатистика сохранена!\033[0m\n";
+			outFileHist << record << "\n";
 		}
-		else if (cmd == "settings")
+		outFileHist.close();
+		if (outs == "YES")
+			cout << "\n\033[93mИстория сохранена!\033[0m\n";
+		
+
+		//================================================
+		// STATS
+		ofstream outFileSt("stats.txt");
+		if (!outFileSt.is_open())
 		{
-			ofstream outFile("settings.txt");
-			if (!outFile.is_open())
-			{
-				cerr << "\n\033[91mОшибка: не удалось открыть файл для записи настроек\033[0m\n";
-				return;
-			}
-
-			for (int i = 0; i < 3; i++)
-			{
-				outFile << settings[i] << "\n";
-			}
-			outFile.close();
-			if (outs == "YES")
-				cout << "\033[93mНастройки сохранены!\033[0m\n";
+			cerr << "\n\033[91mОшибка: не удалось открыть файл для записи статистики\033[0m\n";
+			return;
 		}
+
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			outFileSt << stats[i] << "\n";
+		}
+		outFileSt.close();
+		if (outs == "YES")
+			cout << "\033[93mСтатистика сохранена!\033[0m\n";
+		
+
+		//========================================================
+		// SETTINGS
+		ofstream outFileSet("settings.txt");
+		if (!outFileSet.is_open())
+		{
+			cerr << "\n\033[91mОшибка: не удалось открыть файл для записи настроек\033[0m\n";
+			return;
+		}
+
+		for (int i = 0; i < 3; i++)
+		{
+			outFileSet << settings[i] << "\n";
+		}
+		outFileSet.close(); 
+		if (outs == "YES")
+			cout << "\033[93mНастройки сохранены!\033[0m\n";
 	}
 };
 
@@ -401,21 +399,31 @@ private:
 		cout << "Корень: ?а\n";
 		cout << "Введите а: ";
 		mas[A] = GetFloat();
+		if (mas[A] < 0)
+		{
+			mas[ANS] = sqrt(abs(mas[A]));
+			cout << "Ответ: ?" << mas[A] << " = " << mas[ANS] << "i\n";
+			cout << "(Это не настоящее комплексное число, а всего лишь корень из модуля)\n";
 
-		mas[ANS] = sqrt(mas[A]);
-		cout << "Ответ: ?" << mas[A] << " = " << mas[ANS] << endl;
+			AddHistory("?" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]) + "i");
+		}
+		else
+		{
+			mas[ANS] = sqrt(mas[A]);
+			cout << "Ответ: ?" << mas[A] << " = " << mas[ANS] << endl;
+
+			stats[SQRT]++;
+			AddHistory("?" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		}
 
 		stats[SQRT]++;
-		AddHistory("?" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
 
 public:
 	ArithmeticCalc()
 	{
-		Load("history");
-		Load("stats");
-		Load("settings");
+		Load();
 
 		session_start = time(nullptr);
 		cout << "\033[92mLoading done\033[0m\n";
@@ -424,9 +432,7 @@ public:
 	}
 	~ArithmeticCalc()
 	{
-		Save("history", "YES");
-		Save("stats", "YES");
-		Save("settings", "YES");
+		Save("YES");
 
 		sep();
 		cout << "Выход из программы...\n";
@@ -438,9 +444,7 @@ public:
 
 	bool MainCode()
 	{
-		Save("history", "NO");
-		Save("stats", "NO");
-		Save("settings", "NO");
+		Save("NO");
 
 		CommandList();
 		cout << "\nВведите команду: ";
@@ -542,6 +546,7 @@ private:
 
 				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") + √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
 				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") - √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[X2]));
+				
 				stats[QUAD]++;
 				sep();
 			}
@@ -549,7 +554,8 @@ private:
 			{
 				cout << "Следовательно уравнение не имеет действительных корней\n";
 
-				AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^^ + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
+				AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^2 + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
+				
 				stats[QUAD]++;
 				sep();
 			}
@@ -559,9 +565,7 @@ private:
 public:
 	bool MainCode()
 	{
-		Save("history", "NO");
-		Save("stats", "NO");
-		Save("settings", "NO");
+		Save("NO");
 
 		CommandList();
 		cout << "\nВведите команду: ";
@@ -674,9 +678,7 @@ private:
 public:
 	bool MainCode()
 	{
-		Save("history", "NO");
-		Save("stats", "NO");
-		Save("settings", "NO");
+		Save("NO");
 		CommandList();
 		cout << "\nВведите команду: ";
 		GetCMD();
@@ -736,9 +738,7 @@ class Trigonometry : public Calculator
 public:
 	bool MainCode()
 	{
-		Save("history", "NO");
-		Save("stats", "NO");
-		Save("settings", "NO");
+		Save("NO");
 		CommandList();
 		cout << "\nВведите команду: ";
 		GetCMD();
@@ -787,8 +787,6 @@ private:
 		int a = 0;
 		for (int i = 0; i < STATS_COUNT; i++)
 		{
-			if (i == 9)
-				continue;
 			a = a + stats[i];
 		}
 
@@ -926,12 +924,14 @@ int main()
 	{
 		if (settings[CALC] == 0)
 			is_works = ac.MainCode();
+			
 		else if (settings[CALC] == 1)
 			is_works = al.MainCode();
 		else if (settings[CALC] == 2)
 			is_works = gy.MainCode();
 		else if (settings[CALC] == 3)
 			is_works = ty.MainCode();
+			
 		else if (settings[CALC] == -10)
 			dm.MainCode();
 	}

@@ -15,8 +15,8 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.0.1";
-const int STATS_COUNT = 9;
+const string version = "3.1.0";
+const int STATS_COUNT = 10;
 
 //==================================
 // ПЕРЕМЕННЫЕ И МАССИВЫ
@@ -39,7 +39,7 @@ enum MassiveNums
 };
 enum StatsNums
 {
-	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PYTH, SIN
+	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, PYTH, SIN
 };
 enum SettingsNums
 {
@@ -488,6 +488,7 @@ private:
 		cout << "\033[93mАЛГЕБРАИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
 		cout << "Список доступных комманд:\n\n";
 		cout << "Квадратные уравнения:      [1]\n";
+		cout << "Проценты:                  [2]\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -546,7 +547,6 @@ private:
 
 				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") + √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[ANS]));
 				AddHistory("(-1 * " + FormatFloat(mas[B]) + ") - √" + FormatFloat(mas[DISCR]) + " / (2 * " + FormatFloat(mas[A]) + ") = " + FormatFloat(mas[X2]));
-				
 				stats[QUAD]++;
 				sep();
 			}
@@ -555,11 +555,28 @@ private:
 				cout << "Следовательно уравнение не имеет действительных корней\n";
 
 				AddHistory("Нет действительных корней в уравнении: " + FormatFloat(mas[A]) + "x^2 + " + FormatFloat(mas[B]) + "x + " + FormatFloat(mas[C]) + " = 0");
-				
 				stats[QUAD]++;
 				sep();
 			}
 		}
+	}
+	void Persentage()
+	{
+		ClearCMD();
+		sep();
+
+		cout << "b% от числа a\n";
+		cout << "Введите а: ";
+		mas[A] = GetFloat();
+		cout << "Введите b: ";
+		mas[B] = GetFloat();
+
+		mas[ANS] = (mas[A] / 100) * mas[B];
+		cout << "Ответ: " << mas[B] << "% от числа " << mas[A] << " равняется " << mas[ANS] << endl;
+
+		stats[PERC]++;
+		AddHistory(FormatFloat(mas[B]) + "% от числа " + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		sep();
 	}
 
 public:
@@ -582,6 +599,8 @@ public:
 
 		else if (cmd == "1")
 			Quad();
+		else if (cmd == "2")
+			Persentage();
 
 		else
 		{
@@ -798,6 +817,7 @@ private:
 		cout << "Power: " << stats[POW] << endl;
 		cout << "Square Root: " << stats[SQRT] << endl;
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
+		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Sinus: " << stats[SIN] << endl;
 	}
@@ -924,14 +944,12 @@ int main()
 	{
 		if (settings[CALC] == 0)
 			is_works = ac.MainCode();
-			
 		else if (settings[CALC] == 1)
 			is_works = al.MainCode();
 		else if (settings[CALC] == 2)
 			is_works = gy.MainCode();
 		else if (settings[CALC] == 3)
 			is_works = ty.MainCode();
-			
 		else if (settings[CALC] == -10)
 			dm.MainCode();
 	}

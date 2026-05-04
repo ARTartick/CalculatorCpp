@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.1.0";
+const string version = "3.1.1";
 const int STATS_COUNT = 10;
 
 //==================================
@@ -412,7 +412,6 @@ private:
 			mas[ANS] = sqrt(mas[A]);
 			cout << "Ответ: ?" << mas[A] << " = " << mas[ANS] << endl;
 
-			stats[SQRT]++;
 			AddHistory("?" + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
 		}
 
@@ -773,7 +772,6 @@ public:
 
 		else if (cmd == "1")
 			Sinus();
-
 		else
 		{
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
@@ -831,7 +829,11 @@ private:
 		int minutes = (int)durat / 60;
 		int secondes = (int)durat % 60;
 
-		int total = stats[ADD] + stats[SUB] + stats[MULT] + stats[DIV] + stats[POW] + stats[SQRT] + stats[QUAD] + stats[PYTH] + stats[SIN];
+		int total = 0;
+		for (int i = 0; i < STATS_COUNT; i++)
+		{
+			total = total + stats[i];
+		}
 
 		cout << "Programming language: C++\n";
 		cout << "Name: CALCULATORcpp\n";

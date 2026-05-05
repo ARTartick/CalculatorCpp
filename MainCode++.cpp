@@ -15,8 +15,8 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.1.1";
-const int STATS_COUNT = 10;
+const string version = "3.1.2";
+const int STATS_COUNT = 11;
 
 //==================================
 // ПЕРЕМЕННЫЕ И МАССИВЫ
@@ -39,7 +39,7 @@ enum MassiveNums
 };
 enum StatsNums
 {
-	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, PYTH, SIN
+	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, APR, PYTH, SIN
 };
 enum SettingsNums
 {
@@ -488,6 +488,7 @@ private:
 		cout << "Список доступных комманд:\n\n";
 		cout << "Квадратные уравнения:      [1]\n";
 		cout << "Проценты:                  [2]\n";
+		cout << "Арифметическая прогрессия: [3]\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -577,6 +578,70 @@ private:
 		AddHistory(FormatFloat(mas[B]) + "% от числа " + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
 		sep();
 	}
+	void ArProgress()
+	{
+		ClearCMD();
+		sep();
+
+		cout << "Арифметическая прогрессия:\n";
+		cout << "[1] Найти n член\n";
+		cout << "[2] Найти сумму первых n членов\n";
+
+		cout << "Выберите действие: ";
+		GetCMD();
+
+		if (cmd == "1")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Формула: a_n = a_1 + d(n-1)\n";
+			cout << "Введите первый член последовательности (a_1): ";
+			mas[A] = GetFloat();
+			cout << "Введите разность последовательности (d): ";
+			mas[B] = GetFloat();
+			cout << "Введите какой член нужно найти (n): ";
+			mas[C] = GetFloat();
+
+			if (round(mas[C]) != mas[C])
+			{
+				cout << "n (" << mas[C] << ") было округлено до " << round(mas[C]) << endl;
+				mas[C] = round(mas[C]);
+			}
+
+			mas[ANS] = mas[A] + (mas[B] * (mas[C] - 1));
+			cout << "Ответ: a_" << mas[C] << " = " << mas[A] << " + " << mas[B] << "(" << mas[C] << "-1) = " << mas[ANS];
+			AddHistory("a_" + FormatFloat(mas[C]) + " = " + FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + "(" + FormatFloat(mas[C]) + " - 1) = " + FormatFloat(mas[ANS]));
+		}
+
+		else if (cmd == "2")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Формула: S_n = ((2а_1 + d(n-1) / 2) * n\n";
+
+			cout << "Введите первый член последовательности (а_1): ";
+			mas[A] = GetFloat();
+			cout << "Введите разность последовательности (d): ";
+			mas[B] = GetFloat();
+			cout << "Введите n: ";
+			mas[C] = GetFloat();
+
+			if (round(mas[C]) != mas[C])
+			{
+				cout << "n (" << mas[C] << ") было округлено до " << round(mas[C]) << endl;
+				mas[C] = round(mas[C]);
+			}
+
+			mas[ANS] = (((2*mas[A]) + (mas[B]*(mas[C] - 1))) / 2) * mas[C];
+			cout << "Ответ: S_" << mas[C] << " = ((2*" << mas[A] << " + " << mas[B] << "(" << mas[C] << " - 1)) / 2) * " << mas[C] << " = " << mas[ANS] << endl;
+			AddHistory("S_" + FormatFloat(mas[C]) + " = ((2 * " + FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + "(" + FormatFloat(mas[C]) + " - 1)) / 2) * " + FormatFloat(mas[C]) + " = " + FormatFloat(mas[ANS]));
+		}
+
+		stats[APR]++;
+		sep();
+	}
 
 public:
 	bool MainCode()
@@ -584,8 +649,10 @@ public:
 		Save("NO");
 
 		CommandList();
+
 		cout << "\nВведите команду: ";
 		GetCMD();
+
 		if (cmd == "0" || cmd == "e")
 			return false;
 		else if (cmd == "s")
@@ -600,6 +667,8 @@ public:
 			Quad();
 		else if (cmd == "2")
 			Persentage();
+		else if (cmd == "3")
+			ArProgress();
 
 		else
 		{
@@ -772,6 +841,7 @@ public:
 
 		else if (cmd == "1")
 			Sinus();
+
 		else
 		{
 			cout << "\033[91mОшибка: неизвестная команда\033[0m\n";
@@ -816,6 +886,7 @@ private:
 		cout << "Square Root: " << stats[SQRT] << endl;
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
+		cout << "Arithmetic Progression: " << stats[APR] << endl;
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Sinus: " << stats[SIN] << endl;
 	}
@@ -828,7 +899,6 @@ private:
 
 		int minutes = (int)durat / 60;
 		int secondes = (int)durat % 60;
-
 		int total = 0;
 		for (int i = 0; i < STATS_COUNT; i++)
 		{

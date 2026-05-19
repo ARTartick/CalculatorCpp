@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.1";
+const string version = "3.2.2";
 const int STATS_COUNT = 13;
 
 //==================================
@@ -901,6 +901,23 @@ private:
 			cout << "Ответ: (" << mas[A] << "*" << mas[B] << ") / 2 = " << mas[ANS] << endl;
 			AddHistory("("+FormatFloat(mas[A]) + "*" + FormatFloat(mas[B]) + ") / 2 = " + FormatFloat(mas[ANS]));
 		}
+		else if (cmd == "3")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Площадь трапеции: ((a+b)/2) * h\n";
+			cout << "Введите а: ";
+			mas[A] = abs(GetFloat());
+			cout << "Введите b: ";
+			mas[B] = abs(GetFloat());
+			cout << "Введите h: ";
+			mas[C] = abs(GetFloat());
+
+			mas[ANS] = ((mas[A] + mas[B]) / 2) * mas[C];
+			cout << "Ответ: ((" << mas[A] << "+" << mas[B] << ")/2) * " << mas[C] << " = " << mas[ANS] << endl;
+			AddHistory("((" + FormatFloat(mas[A]) + "+" + FormatFloat(mas[B]) + ")/2) * " + FormatFloat(mas[C]) + " = " + FormatFloat(mas[ANS]));
+		}
 		stats[AREA]++;
 	}
 
@@ -1027,12 +1044,15 @@ private:
 		cout << "Multiplication: " << stats[MULT] << endl;
 		cout << "Division: " << stats[DIV] << endl;
 		cout << "Power: " << stats[POW] << endl;
-		cout << "Square Root: " << stats[SQRT] << endl;
+		cout << "Square Root: " << stats[SQRT] << endl << endl;
+		
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Arithmetic Progression: " << stats[APR] << endl;
-		cout << "Geometrical Progression: " << stats[GPR] << endl;
+		cout << "Geometrical Progression: " << stats[GPR] << endl << endl;
+		
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
+		cout << "Areas: " << stats[AREA] << endl; 
 		cout << "Sinus: " << stats[SIN] << endl;
 	}
 	void GeneralStats()

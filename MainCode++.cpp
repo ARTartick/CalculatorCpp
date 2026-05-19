@@ -15,8 +15,8 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.1.2";
-const int STATS_COUNT = 11;
+const string version = "3.2.0";
+const int STATS_COUNT = 13;
 
 //==================================
 // ПЕРЕМЕННЫЕ И МАССИВЫ
@@ -39,7 +39,7 @@ enum MassiveNums
 };
 enum StatsNums
 {
-	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, APR, PYTH, SIN
+	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, APR, GPR, PYTH, POL, SIN
 };
 enum SettingsNums
 {
@@ -489,6 +489,7 @@ private:
 		cout << "Квадратные уравнения:      [1]\n";
 		cout << "Проценты:                  [2]\n";
 		cout << "Арифметическая прогрессия: [3]\n";
+		cout << "Геометрическая прогрессия: [4]\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -610,6 +611,7 @@ private:
 			}
 
 			mas[ANS] = mas[A] + (mas[B] * (mas[C] - 1));
+			stats[APR]++;
 			cout << "Ответ: a_" << mas[C] << " = " << mas[A] << " + " << mas[B] << "(" << mas[C] << "-1) = " << mas[ANS];
 			AddHistory("a_" + FormatFloat(mas[C]) + " = " + FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + "(" + FormatFloat(mas[C]) + " - 1) = " + FormatFloat(mas[ANS]));
 		}
@@ -619,7 +621,7 @@ private:
 			ClearCMD();
 			sep();
 
-			cout << "Формула: S_n = ((2а_1 + d(n-1) / 2) * n\n";
+			cout << "Формула: S_n = ((2а_1 + d(n-1)) / 2) * n\n";
 
 			cout << "Введите первый член последовательности (а_1): ";
 			mas[A] = GetFloat();
@@ -635,11 +637,91 @@ private:
 			}
 
 			mas[ANS] = (((2*mas[A]) + (mas[B]*(mas[C] - 1))) / 2) * mas[C];
+			stats[APR]++;
 			cout << "Ответ: S_" << mas[C] << " = ((2*" << mas[A] << " + " << mas[B] << "(" << mas[C] << " - 1)) / 2) * " << mas[C] << " = " << mas[ANS] << endl;
 			AddHistory("S_" + FormatFloat(mas[C]) + " = ((2 * " + FormatFloat(mas[A]) + " + " + FormatFloat(mas[B]) + "(" + FormatFloat(mas[C]) + " - 1)) / 2) * " + FormatFloat(mas[C]) + " = " + FormatFloat(mas[ANS]));
 		}
+		else
+		{
+			cout << "\033[91mОшибка: неправильный ввод!\033[0m\n";
+			stats[ERR]++;
+		}
 
-		stats[APR]++;
+		sep();
+	}
+	void GeoProg()
+	{
+		ClearCMD();
+		sep();
+
+		cout << "Геометрическая прогрессия:\n";
+		cout << "[1] Найти n член\n";
+		cout << "[2] Найти сумму первых n членов\n";
+
+		cout << "Выберите действие: ";
+		GetCMD();
+
+		if (cmd == "1")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Формула: b_n = b_1 * q^(n-1)\n";
+			cout << "Введите первый член последовательности (b_1): ";
+			mas[A] = GetFloat();
+			cout << "Введите знаменатель последовательности (q): ";
+			mas[B] = GetFloat();
+			cout << "Введите какой член нужно найти (n): ";
+			mas[C] = GetFloat();
+
+			if (round(mas[C]) != mas[C])
+			{
+				cout << "n (" << mas[C] << ") было округлено до " << round(mas[C]) << endl;
+				mas[C] = round(mas[C]);
+			}
+
+			mas[ANS] = mas[A] * pow(mas[B], (mas[C]-1));
+			stats[GPR]++;
+			cout << "Ответ: b_" << mas[C] << " = " << mas[A] << " * " << mas[B] << "^(" << mas[C] << "-1) = " << mas[ANS] << endl;
+			AddHistory("b_" + FormatFloat(mas[C]) + " = " + FormatFloat(mas[A]) + " * " + FormatFloat(mas[B]) + "^(" + FormatFloat(mas[C]) + " - 1) = " + FormatFloat(mas[ANS]));
+		}
+
+		else if (cmd == "2")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Формула: S_n = (b_1 * (q^n - 1)) / (q - 1)\n";
+
+			cout << "Введите первый член последовательности (b_1): ";
+			mas[A] = GetFloat();
+			cout << "Введите знаменатель последовательности (q): ";
+			mas[B] = GetFloat();
+
+			while (mas[B] == 1)
+			{
+				cout << "\033[91mq не может равняться 1\033[0m\n";
+				mas[B] = GetFloat();
+			}
+			cout << "Введите n: ";
+			mas[C] = GetFloat();
+
+			if (round(mas[C]) != mas[C])
+			{
+				cout << "n (" << mas[C] << ") было округлено до " << round(mas[C]) << endl;
+				mas[C] = round(mas[C]);
+			}
+
+			mas[ANS] = (mas[A] * (pow(mas[B], mas[C]) - 1)) / (mas[B] - 1);
+			stats[GPR]++;
+			cout << "Ответ: S_" << mas[C] << " = (" << mas[A] << " * " << "(" << mas[B] << "^" << mas[C] << " - 1)) / (" << mas[B] << " - 1) = " << mas[ANS] << endl;
+			AddHistory("S_" + FormatFloat(mas[C]) + " = (" + FormatFloat(mas[A]) + " * (" + FormatFloat(mas[B]) + "^" + FormatFloat(mas[C]) + " - 1)) / (" + FormatFloat(mas[B]) + " - 1) = " + FormatFloat(mas[ANS]));
+		}
+		else
+		{
+			cout << "\033[91mОшибка: неправильный ввод!\033[0m\n";
+			stats[ERR]++;
+		}
 		sep();
 	}
 
@@ -669,6 +751,8 @@ public:
 			Persentage();
 		else if (cmd == "3")
 			ArProgress();
+		else if (cmd == "4")
+			GeoProg();
 
 		else
 		{
@@ -687,6 +771,8 @@ private:
 		cout << "\033[93mГЕОМЕТРИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
 		cout << "Список доступных комманд:\n\n";
 		cout << "Теорема Пифагора:          [1]\n";
+		cout << "Многоугольники:            [2] (in progress...)\n";
+		cout << "Окружности, дуги:          [3] (in progress...)\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -761,6 +847,47 @@ private:
 			stats[ERR]++;
 		}
 	}
+	void Polygon()
+	{
+		ClearCMD();
+		sep();
+
+		cmd = "null";
+
+		cout << "Площади:\n";
+		cout << "паралелограмма:  [1]\n";
+		cout << "треугольника:    [2] (in progress...)\n";
+		cout << "трапеции:        [3] (in progress...)\n\n";
+
+		cout << "Вернуться:       [0]\n";
+
+		cout << "Ввод: ";
+		GetCMD();
+
+		if (cmd == "0")
+		{
+			ClearCMD();
+			sep();
+
+			return;
+		}
+		else if (cmd == "1")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Площадь паралелограмма: a*h\n";
+			cout << "Введите а: ";
+			mas[A] = abs(GetFloat());
+			cout << "Введите h: ";
+			mas[B] = abs(GetFloat());
+
+			mas[ANS] = mas[A] * mas[B];
+			cout << "Ответ: " << mas[A] << "*" << mas[B] << " = " << mas[ANS] << endl;
+			AddHistory(FormatFloat(mas[A]) + "*" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
+			stats[POL]++;
+		}
+	}
 
 public:
 	bool MainCode()
@@ -781,6 +908,8 @@ public:
 
 		else if (cmd == "1")
 			PyTh();
+		else if (cmd == "2")
+			Polygon();
 
 		else
 		{
@@ -887,6 +1016,7 @@ private:
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Arithmetic Progression: " << stats[APR] << endl;
+		cout << "Geometrical Progression: " << stats[GPR] << endl;
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Sinus: " << stats[SIN] << endl;
 	}

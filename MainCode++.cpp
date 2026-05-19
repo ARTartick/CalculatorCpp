@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.0";
+const string version = "3.2.1";
 const int STATS_COUNT = 13;
 
 //==================================
@@ -39,7 +39,7 @@ enum MassiveNums
 };
 enum StatsNums
 {
-	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, APR, GPR, PYTH, POL, SIN
+	ADD, SUB, MULT, DIV, POW, SQRT, QUAD, PERC, APR, GPR, PYTH, AREA, SIN
 };
 enum SettingsNums
 {
@@ -885,8 +885,23 @@ private:
 			mas[ANS] = mas[A] * mas[B];
 			cout << "Ответ: " << mas[A] << "*" << mas[B] << " = " << mas[ANS] << endl;
 			AddHistory(FormatFloat(mas[A]) + "*" + FormatFloat(mas[B]) + " = " + FormatFloat(mas[ANS]));
-			stats[POL]++;
 		}
+		else if (cmd == "2")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Площадь треугольника: 2 / (a*h)\n";
+			cout << "Введите а: ";
+			mas[A] = abs(GetFloat());
+			cout << "Введите h: ";
+			mas[B] = abs(GetFloat());
+
+			mas[ANS] = (mas[A]*mas[B])/2;
+			cout << "Ответ: (" << mas[A] << "*" << mas[B] << ") / 2 = " << mas[ANS] << endl;
+			AddHistory("("+FormatFloat(mas[A]) + "*" + FormatFloat(mas[B]) + ") / 2 = " + FormatFloat(mas[ANS]));
+		}
+		stats[AREA]++;
 	}
 
 public:

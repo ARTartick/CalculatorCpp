@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.3";
+const string version = "3.2.4";
 const int STATS_COUNT = 13;
 
 //==================================
@@ -294,6 +294,8 @@ private:
 		cout << "Вычитание:                 [2]\n";
 		cout << "Умножение:                 [3]\n";
 		cout << "Деление:                   [4]\n";
+		cout << "Степень:                   [5]\n";
+		cout << "Квадратный корень:         [6]\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -365,6 +367,12 @@ private:
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
 		mas[B] = GetFloat();
+		while (mas[B] == 0)
+		{
+			cout << "Число b не может быть равным 0\n";
+			cout << "Повторите ввод: ";
+			mas[B] = GetFloat();
+		}
 
 		mas[ANS] = mas[A] / mas[B];
 		cout << "Ответ: " << mas[A] << " / " << mas[B] << " = " << mas[ANS] << endl;
@@ -383,6 +391,14 @@ private:
 		mas[A] = GetFloat();
 		cout << "Введите b: ";
 		mas[B] = GetFloat();
+		while (mas[A] == 0 && mas[B] < 0)
+		{
+			cout << "\033[91mОшибка: 0 нельзя возводить в отрицательную степень\033[0m\n";
+			cout << "Введите а снова: ";
+			mas[A] = GetFloat();
+			cout << "Введите b снова: ";
+			mas[B] = GetFloat();
+		}
 
 		mas[ANS] = pow(mas[A], mas[B]);
 		cout << "Ответ: " << mas[A] << "^" << mas[B] << " = " << mas[ANS] << endl;
@@ -771,7 +787,7 @@ private:
 		cout << "\033[93mГЕОМЕТРИЧЕСКИЙ КАЛЬКУЛЯТОР\033[0m\n\n";
 		cout << "Список доступных комманд:\n\n";
 		cout << "Теорема Пифагора:          [1]\n";
-		cout << "Многоугольники:            [2] (in progress...)\n";
+		cout << "Многоугольники:            [2]\n";
 		cout << "Окружности, дуги:          [3] (in progress...)\n";
 
 		cout << endl;
@@ -856,8 +872,8 @@ private:
 
 		cout << "Площади:\n";
 		cout << "паралелограмма:  [1]\n";
-		cout << "треугольника:    [2] (in progress...)\n";
-		cout << "трапеции:        [3] (in progress...)\n\n";
+		cout << "треугольника:    [2]\n";
+		cout << "трапеции:        [3]\n\n";
 
 		cout << "Вернуться:       [0]\n";
 
@@ -1045,12 +1061,10 @@ private:
 		cout << "Division: " << stats[DIV] << endl;
 		cout << "Power: " << stats[POW] << endl;
 		cout << "Square Root: " << stats[SQRT] << endl << endl;
-		
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Arithmetic Progression: " << stats[APR] << endl;
 		cout << "Geometrical Progression: " << stats[GPR] << endl << endl;
-		
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Areas: " << stats[AREA] << endl; 
 		cout << "Sinus: " << stats[SIN] << endl;
@@ -1111,6 +1125,7 @@ private:
 		cout << "Статистика успешно очищена\n";
 
 	}
+
 	void QuitDebugMode()
 	{
 		cout << "\n=======================\n";

@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.2";
+const string version = "3.2.3";
 const int STATS_COUNT = 13;
 
 //==================================
@@ -891,7 +891,7 @@ private:
 			ClearCMD();
 			sep();
 
-			cout << "Площадь треугольника: 2 / (a*h)\n";
+			cout << "Площадь треугольника: (a*h) / 2\n";
 			cout << "Введите а: ";
 			mas[A] = abs(GetFloat());
 			cout << "Введите h: ";

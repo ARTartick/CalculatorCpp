@@ -15,8 +15,9 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.4";
+const string version = "3.2.5";
 const int STATS_COUNT = 13;
+const double pi = 3.14159265f;
 
 //==================================
 // ПЕРЕМЕННЫЕ И МАССИВЫ
@@ -788,7 +789,7 @@ private:
 		cout << "Список доступных комманд:\n\n";
 		cout << "Теорема Пифагора:          [1]\n";
 		cout << "Многоугольники:            [2]\n";
-		cout << "Окружности, дуги:          [3] (in progress...)\n";
+		cout << "Окружности, дуги:          [3]\n";
 
 		cout << endl;
 		cout << "Смена калькулятора:    [-]/[+]\n";
@@ -936,6 +937,46 @@ private:
 		}
 		stats[AREA]++;
 	}
+	void Rounds()
+	{
+
+		ClearCMD();
+		sep();
+
+		cmd = "null";
+
+		cout << "Окружности и дуги:\n";
+		cout << "Периметр круга:  [1]\n";
+		cout << "Площадь круга:   [2] (in progress...)\n";
+		cout << "Длина дуги:      [3] (in progress...)\n";
+		cout << "Площадь сектора: [4] (in progress...)\n";
+
+		cout << "\nВернуться:       [0]\n";
+
+		cout << "Ввод: ";
+		GetCMD();
+
+		if (cmd == "0")
+		{
+			ClearCMD();
+			sep();
+
+			return;
+		}
+		else if (cmd == "1")
+		{
+			ClearCMD();
+			sep();
+
+			cout << "Периметр круга: P = 2*pi*r\npi = ~3,14\n";
+			cout << "Введите r (радиус): ";
+			mas[A] = GetFloat();
+
+			mas[ANS] = 2*mas[A]*pi;
+			cout << "Ответ: 2 * 3,14 * " << mas[A] << " = " << mas[ANS] << endl;
+			AddHistory("2 * 3,14 * " + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		}
+	}
 
 public:
 	bool MainCode()
@@ -958,6 +999,8 @@ public:
 			PyTh();
 		else if (cmd == "2")
 			Polygon();
+		else if (cmd == "3")
+			Rounds();
 
 		else
 		{
@@ -1061,12 +1104,15 @@ private:
 		cout << "Division: " << stats[DIV] << endl;
 		cout << "Power: " << stats[POW] << endl;
 		cout << "Square Root: " << stats[SQRT] << endl << endl;
+		
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Arithmetic Progression: " << stats[APR] << endl;
 		cout << "Geometrical Progression: " << stats[GPR] << endl << endl;
+		
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Areas: " << stats[AREA] << endl; 
+		
 		cout << "Sinus: " << stats[SIN] << endl;
 	}
 	void GeneralStats()
@@ -1125,7 +1171,6 @@ private:
 		cout << "Статистика успешно очищена\n";
 
 	}
-
 	void QuitDebugMode()
 	{
 		cout << "\n=======================\n";

@@ -15,7 +15,7 @@ using namespace std;
 //==================================
 // КОНСТАНТЫ
 //==================================
-const string version = "3.2.5";
+const string version = "3.2.6";
 const int STATS_COUNT = 13;
 const double pi = 3.14159265f;
 
@@ -947,7 +947,7 @@ private:
 
 		cout << "Окружности и дуги:\n";
 		cout << "Периметр круга:  [1]\n";
-		cout << "Площадь круга:   [2] (in progress...)\n";
+		cout << "Площадь круга:   [2]\n";
 		cout << "Длина дуги:      [3] (in progress...)\n";
 		cout << "Площадь сектора: [4] (in progress...)\n";
 
@@ -970,11 +970,25 @@ private:
 
 			cout << "Периметр круга: P = 2*pi*r\npi = ~3,14\n";
 			cout << "Введите r (радиус): ";
-			mas[A] = GetFloat();
+			mas[A] = abs(GetFloat());
 
 			mas[ANS] = 2*mas[A]*pi;
 			cout << "Ответ: 2 * 3,14 * " << mas[A] << " = " << mas[ANS] << endl;
 			AddHistory("2 * 3,14 * " + FormatFloat(mas[A]) + " = " + FormatFloat(mas[ANS]));
+		}
+		else if (cmd == "2")
+		{
+
+			ClearCMD();
+			sep();
+
+			cout << "Площадь круга: S = pi*r^2\n";
+			cout << "Введите r (радиус): ";
+			mas[A] = abs(GetFloat());
+
+			mas[ANS] = pi * pow(mas[A], 2);
+			cout << "Ответ: 3,14 * " << mas[A] << "^2 = " << mas[ANS] << endl;
+			AddHistory("3,14 * " + FormatFloat(mas[A]) + "^2 = " + FormatFloat(mas[ANS]));
 		}
 	}
 
@@ -1104,15 +1118,12 @@ private:
 		cout << "Division: " << stats[DIV] << endl;
 		cout << "Power: " << stats[POW] << endl;
 		cout << "Square Root: " << stats[SQRT] << endl << endl;
-		
 		cout << "Quadratic Equation: " << stats[QUAD] << endl;
 		cout << "Percentage: " << stats[PERC] << endl;
 		cout << "Arithmetic Progression: " << stats[APR] << endl;
 		cout << "Geometrical Progression: " << stats[GPR] << endl << endl;
-		
 		cout << "Pythagorean Theorem: " << stats[PYTH] << endl;
 		cout << "Areas: " << stats[AREA] << endl; 
-		
 		cout << "Sinus: " << stats[SIN] << endl;
 	}
 	void GeneralStats()
@@ -1213,7 +1224,6 @@ public:
 			default: cout << "\033[91mError: Incorrect cmd\033[0m\n"; settings[ERR]++;
 			}
 		}
-
 		settings[CALC] = 0;
 	}
 };
